@@ -5,14 +5,7 @@ export const USER_ROLES = ['VIEWER', 'ADMIN'] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 /** Asset-class values that appear in instruments.csv and the portfolio view. */
-export const ASSET_CLASSES = [
-  'EQUITY',
-  'ETF',
-  'MUTUAL_FUND',
-  'BOND',
-  'REIT',
-  'GSEC',
-] as const;
+export const ASSET_CLASSES = ['EQUITY', 'ETF', 'MUTUAL_FUND', 'BOND', 'REIT', 'GSEC'] as const;
 export type AssetClass = (typeof ASSET_CLASSES)[number];
 
 /** Transaction types. */
@@ -46,17 +39,19 @@ export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 export const IMPORT_OUTCOMES = ['imported', 'duplicate', 'rejected', 'future_dated'] as const;
 export type ImportOutcome = (typeof IMPORT_OUTCOMES)[number];
 
-/** KYC statuses. */
-export const KYC_STATUSES = ['VERIFIED', 'PENDING', 'EXPIRED'] as const;
+/** KYC statuses matching database schema and data dictionary. */
+export const KYC_STATUSES = ['VERIFIED', 'PENDING', 'REVIEW'] as const;
 export type KycStatus = (typeof KYC_STATUSES)[number];
 
-/** Customer segments. */
-export const CUSTOMER_SEGMENTS = ['RETAIL', 'HNI', 'UHNI', 'INSTITUTIONAL'] as const;
+/** Customer segments matching database schema and data dictionary. */
+export const CUSTOMER_SEGMENTS = ['Mass', 'Affluent', 'HNI'] as const;
 export type CustomerSegment = (typeof CUSTOMER_SEGMENTS)[number];
 
-/** Risk categories. */
-export const RISK_CATEGORIES = ['CONSERVATIVE', 'MODERATE', 'AGGRESSIVE'] as const;
-export type RiskCategory = (typeof RISK_CATEGORIES)[number];
+/** Risk levels matching database schema and data dictionary. */
+export const RISK_LEVELS = ['Conservative', 'Moderate', 'Growth', 'Aggressive'] as const;
+export type RiskLevel = (typeof RISK_LEVELS)[number];
+export const RISK_CATEGORIES = RISK_LEVELS;
+export type RiskCategory = RiskLevel;
 
 /** Pagination defaults. */
 export const DEFAULT_PAGE = 1;

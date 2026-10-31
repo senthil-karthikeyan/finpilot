@@ -8,6 +8,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { DatabaseModule } from './database/database.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { CustomersModule } from './customers/customers.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 
@@ -24,6 +25,9 @@ import { RolesGuard } from './auth/guards/roles.guard.js';
 
     // ── Authentication & Access Control ──────────────────────────────────────
     AuthModule,
+
+    // ── Customers — Search, Profile & Accounts ───────────────────────────────
+    CustomersModule,
 
     // ── Config — makes process.env available across all modules ──────────────
     ConfigModule.forRoot({
