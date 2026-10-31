@@ -135,7 +135,9 @@ describe('Next.js API Proxy Route Handler & Auth Lifecycle', () => {
         headers: new Headers({ 'Content-Type': 'application/json' }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ data: [{ id: 'C0001' }] })));
+            controller.enqueue(
+              new TextEncoder().encode(JSON.stringify({ data: [{ id: 'C0001' }] })),
+            );
             controller.close();
           },
         }),
@@ -163,7 +165,10 @@ describe('Next.js API Proxy Route Handler & Auth Lifecycle', () => {
         }),
       );
 
-      const calledHeaders = (global.fetch as any).mock.calls[0][1].headers as Headers;
+      const fetchMock = vi.mocked(global.fetch);
+      const call = fetchMock.mock.calls[0];
+      expect(call).toBeDefined();
+      const calledHeaders = call?.[1]?.headers as Headers;
       expect(calledHeaders.get('Authorization')).toBe('Bearer session-token-xyz');
       // Host and cookie should NOT be forwarded to backend
       expect(calledHeaders.get('cookie')).toBeNull();
@@ -177,7 +182,9 @@ describe('Next.js API Proxy Route Handler & Auth Lifecycle', () => {
         headers: new Headers({ 'Content-Type': 'application/json' }),
         body: new ReadableStream({
           start(controller) {
-            controller.enqueue(new TextEncoder().encode(JSON.stringify({ message: 'Authentication required' })));
+            controller.enqueue(
+              new TextEncoder().encode(JSON.stringify({ message: 'Authentication required' })),
+            );
             controller.close();
           },
         }),
@@ -192,9 +199,11 @@ describe('Next.js API Proxy Route Handler & Auth Lifecycle', () => {
       });
 
       expect(response.status).toBe(401);
-      const calledHeaders = (global.fetch as any).mock.calls[0][1].headers as Headers;
+      const fetchMock = vi.mocked(global.fetch);
+      const call = fetchMock.mock.calls[0];
+      expect(call).toBeDefined();
+      const calledHeaders = call?.[1]?.headers as Headers;
       expect(calledHeaders.get('Authorization')).toBeNull();
     });
   });
 });
-
