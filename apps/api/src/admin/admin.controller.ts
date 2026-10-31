@@ -3,10 +3,13 @@ import {
   Get,
   Param,
   Post,
+  Query,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -17,12 +20,14 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { type AuthUser } from '@finpilot/shared';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { AdminService, type UploadedCsvFile } from './admin.service.js';
 
+@ApiBearerAuth()
 @ApiTags('Admin')
 @Controller('admin')
 @Roles('ADMIN')
@@ -104,6 +109,63 @@ export class AdminController {
   })
   async getImportBatch(@Param('batchId') batchId: string) {
     return this.adminService.getImportBatch(batchId);
+  }
+
+  @Get('imports/:batchId/rejected')
+  @ApiOperation({
+    summary: 'Get paginated rejected rows for an import batch (Admin only)',
+    description:
+      'Returns paginated list of rejected and duplicate rows for an import batch.',
+  })
+  @ApiParam({
+    name: 'batchId',
+    description: 'Batch identifier (e.g. IMP-0001)',
+    example: 'IMP-0001',
+  })
+  @ApiOkResponse({
+    description: 'Paginated rejected rows.',
+  })
+  @ApiForbiddenResponse({
+    description: 'Access denied: requires ADMIN role.',
+  })
+  async getRejectedRows(
+    @Param('batchId') batchId: string,
+    @Query('page') page: string = '1',
+    @Query('pageSize') pageSize: string = '100',
+  ) {
+    const pageNum = parseInt(page, 10) || 1;
+    const pageSizeNum = parseInt(pageSize, 10) || 100;
+    return this.adminService.getRejectedRows(batchId, pageNum, pageSizeNum);
+  }
+
+  @Get('imports/:batchId/rejected/csv')
+  @ApiOperation({
+    summary: 'Download CSV of rejected rows for an import batch (Admin only)',
+    description:
+      'Generates and streams a CSV file of all rejected and duplicate rows for an import batch.',
+  })
+  @ApiParam({
+    name: 'batchId',
+    description: 'Batch identifier (e.g. IMP-0001)',
+    example: 'IMP-0001',
+  })
+  @ApiOkResponse({
+    description: 'CSV file download of rejected rows.',
+  })
+  @ApiForbiddenResponse({
+    description: 'Access denied: requires ADMIN role.',
+  })
+  async downloadRejectedRowsCsv(
+    @Param('batchId') batchId: string,
+    @Res() res: Response,
+  ) {
+    const csvData = await this.adminService.getRejectedRowsCsv(batchId);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="rejected_rows_${batchId}.csv"`,
+    );
+    res.send(csvData);
   }
 
   @Get('data-quality')

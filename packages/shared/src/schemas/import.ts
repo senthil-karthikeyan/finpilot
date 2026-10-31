@@ -62,3 +62,16 @@ export const DataQualityResponseSchema = z.object({
   generatedAt: z.string(), // ISO timestamp
 });
 export type DataQualityResponse = z.infer<typeof DataQualityResponseSchema>;
+
+// ── Paginated rejected import rows (GET /admin/imports/:batchId/rejected) ────
+
+export const PaginatedRejectedRowsResponseSchema = z.object({
+  data: z.array(ImportRowResultSchema),
+  meta: z.object({
+    page: z.number().int(),
+    pageSize: z.number().int(),
+    total: z.number().int(),
+    totalPages: z.number().int(),
+  }),
+});
+export type PaginatedRejectedRowsResponse = z.infer<typeof PaginatedRejectedRowsResponseSchema>;

@@ -80,9 +80,8 @@ describe('AdminService', () => {
       expect(result.totalRows).toBe(2);
       expect(result.imported).toBe(1);
       expect(result.rejected).toBe(1);
-      expect(result.rows).toHaveLength(2);
-      expect(result.rows[0].outcome).toBe('imported');
-      expect(result.rows[1].outcome).toBe('rejected');
+      expect(result.rows).toHaveLength(1);
+      expect(result.rows[0].outcome).toBe('rejected');
     });
   });
 
@@ -213,6 +212,116 @@ describe('AdminService', () => {
         'duplicate_transactions',
         'invalid_references',
       ]);
+    });
+  });
+
+  describe('getRejectedRows', () => {
+    it('returns paginated rejected rows for a batch', async () => {
+      let call = 0;
+      mockDb.select.mockImplementation(() => {
+        call++;
+        if (call === 1) {
+          // Find batch
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ batchId: 'IMP-0001' }]),
+              }),
+            }),
+          };
+        }
+        if (call === 2) {
+          // Count rejected rows
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([{ total: 1 }]),
+            }),
+          };
+        }
+        // Fetch rows
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockReturnValue({
+                  offset: vi.fn().mockResolvedValue([
+                    {
+                      lineNumber: 3,
+                      transactionId: 'T0002',
+                      outcome: 'rejected',
+                      errorMessage: 'Invalid FK',
+                    },
+                  ]),
+                }),
+              }),
+            }),
+          }),
+        };
+      });
+
+      const res = await service.getRejectedRows('IMP-0001', 1, 100);
+
+      expect(res.data).toHaveLength(1);
+      expect(res.data[0].rowNumber).toBe(3);
+      expect(res.data[0].outcome).toBe('rejected');
+      expect(res.meta).toEqual({
+        page: 1,
+        pageSize: 100,
+        total: 1,
+        totalPages: 1,
+      });
+    });
+
+    it('throws NotFoundException when batch does not exist', async () => {
+      mockDb.select.mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+
+      await expect(service.getRejectedRows('NONEXISTENT')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('getRejectedRowsCsv', () => {
+    it('generates CSV string for rejected rows', async () => {
+      let call = 0;
+      mockDb.select.mockImplementation(() => {
+        call++;
+        if (call === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ batchId: 'IMP-0001' }]),
+              }),
+            }),
+          };
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockResolvedValue([
+                {
+                  lineNumber: 2,
+                  transactionId: 'T0001',
+                  outcome: 'rejected',
+                  errorCode: 'ERR_1',
+                  errorMessage: 'Error msg',
+                  rawData: null,
+                },
+              ]),
+            }),
+          }),
+        };
+      });
+
+      const csv = await service.getRejectedRowsCsv('IMP-0001');
+      expect(csv).toContain('line_number,transaction_id,outcome,error_code,reason,raw_data');
+      expect(csv).toContain('2,T0001,rejected,ERR_1,"Error msg",""');
     });
   });
 });

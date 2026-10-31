@@ -5,11 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
-import { sql, eq, desc } from 'drizzle-orm';
+import { sql, eq, desc, and } from 'drizzle-orm';
 import {
   type ImportResponse,
   type ImportBatch,
   type DataQualityResponse,
+  type PaginatedRejectedRowsResponse,
   MAX_IMPORT_FILE_BYTES,
 } from '@finpilot/shared';
 import { DRIZZLE_DB, type DrizzleDb } from '../database/database.module.js';
@@ -65,9 +66,12 @@ export class AdminService {
         columns: true,
         skip_empty_lines: true,
         trim: true,
+        bom: true,
       });
-    } catch (err: any) {
-      throw new BadRequestException(`Failed to parse CSV file: ${err.message}`);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : 'Unknown CSV parse error';
+      throw new BadRequestException(`Failed to parse CSV file: ${msg}`);
     }
 
     if (!Array.isArray(parsedRows) || parsedRows.length === 0) {
@@ -222,6 +226,12 @@ export class AdminService {
       })
       .where(eq(schema.importBatches.batchId, batchId));
 
+    // Return counts plus at most the first 100 rejected or duplicate rows
+    const rejectedRows = rowResults.filter(
+      (r) => r.outcome === 'rejected' || r.outcome === 'duplicate',
+    );
+    const cappedRows = rejectedRows.slice(0, 100);
+
     return {
       batchId,
       fileName: file.originalname,
@@ -232,7 +242,7 @@ export class AdminService {
       rejected: rejectedCount,
       durationMs,
       status: 'COMPLETED',
-      rows: rowResults,
+      rows: cappedRows,
     };
   }
 
@@ -383,5 +393,110 @@ export class AdminService {
         },
       ],
     };
+  }
+
+  /**
+   * Paginated rejected/duplicate rows for an import batch.
+   */
+  async getRejectedRows(
+    batchId: string,
+    page: number = 1,
+    pageSize: number = 100,
+  ): Promise<PaginatedRejectedRowsResponse> {
+    const cleanBatchId = batchId.trim();
+    const clampedPage = Math.max(page, 1);
+    const clampedPageSize = Math.min(Math.max(pageSize, 1), 100);
+    const offset = (clampedPage - 1) * clampedPageSize;
+
+    const [batch] = await this.db
+      .select()
+      .from(schema.importBatches)
+      .where(eq(schema.importBatches.batchId, cleanBatchId))
+      .limit(1);
+
+    if (!batch) {
+      throw new NotFoundException(
+        `Import batch with ID '${batchId}' was not found.`,
+      );
+    }
+
+    const whereClause = and(
+      eq(schema.importRows.batchId, cleanBatchId),
+      sql`${schema.importRows.outcome} IN ('rejected', 'duplicate')`,
+    );
+
+    const [countResult] = await this.db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(schema.importRows)
+      .where(whereClause);
+
+    const total = countResult?.total ?? 0;
+    const totalPages = Math.ceil(total / clampedPageSize) || 1;
+
+    const rows = await this.db
+      .select()
+      .from(schema.importRows)
+      .where(whereClause)
+      .orderBy(schema.importRows.lineNumber)
+      .limit(clampedPageSize)
+      .offset(offset);
+
+    return {
+      data: rows.map((r) => ({
+        rowNumber: r.lineNumber,
+        transactionId: r.transactionId ?? undefined,
+        outcome: r.outcome as 'rejected' | 'duplicate',
+        reason: r.errorMessage ?? undefined,
+      })),
+      meta: {
+        page: clampedPage,
+        pageSize: clampedPageSize,
+        total,
+        totalPages,
+      },
+    };
+  }
+
+  /**
+   * Export all rejected/duplicate rows for an import batch as CSV string.
+   */
+  async getRejectedRowsCsv(batchId: string): Promise<string> {
+    const cleanBatchId = batchId.trim();
+    const [batch] = await this.db
+      .select()
+      .from(schema.importBatches)
+      .where(eq(schema.importBatches.batchId, cleanBatchId))
+      .limit(1);
+
+    if (!batch) {
+      throw new NotFoundException(
+        `Import batch with ID '${batchId}' was not found.`,
+      );
+    }
+
+    const rows = await this.db
+      .select()
+      .from(schema.importRows)
+      .where(
+        and(
+          eq(schema.importRows.batchId, cleanBatchId),
+          sql`${schema.importRows.outcome} IN ('rejected', 'duplicate')`,
+        ),
+      )
+      .orderBy(schema.importRows.lineNumber);
+
+    const header =
+      'line_number,transaction_id,outcome,error_code,reason,raw_data\n';
+    const lines = rows.map((r) => {
+      const lineNo = r.lineNumber;
+      const txId = r.transactionId ?? '';
+      const outcome = r.outcome;
+      const code = r.errorCode ?? '';
+      const reason = `"${(r.errorMessage ?? '').replace(/"/g, '""')}"`;
+      const raw = `"${(r.rawData ? JSON.stringify(r.rawData) : '').replace(/"/g, '""')}"`;
+      return `${lineNo},${txId},${outcome},${code},${reason},${raw}`;
+    });
+
+    return header + lines.join('\n');
   }
 }

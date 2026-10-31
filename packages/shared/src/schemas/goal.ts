@@ -51,16 +51,8 @@ export const CreateGoalSchema = z.object({
   goalType: z.enum(GOAL_TYPES, { message: 'Invalid goal type.' }).optional(),
   priority: z.enum(GOAL_PRIORITIES, { message: 'Invalid priority.' }),
   targetAmount: z.number().positive('Target amount must be positive.'),
-  currentAmount: z
-    .number()
-    .min(0, 'Current amount cannot be negative.')
-    .default(0)
-    .optional(),
-  currentFundedAmount: z
-    .number()
-    .min(0, 'Funded amount cannot be negative.')
-    .default(0)
-    .optional(),
+  currentAmount: z.number().min(0, 'Current amount cannot be negative.').default(0).optional(),
+  currentFundedAmount: z.number().min(0, 'Funded amount cannot be negative.').default(0).optional(),
   // Create rule: targetDate must be today or later.
   targetDate: z
     .string()
