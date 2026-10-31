@@ -1,0 +1,1354 @@
+{
+  "id": "c9c39e4c-9e6b-4911-bce2-fb33394a6f4d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.customers": {
+      "name": "customers",
+      "schema": "",
+      "columns": {
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_of_birth": {
+          "name": "date_of_birth",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "onboarded_at": {
+          "name": "onboarded_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kyc_status": {
+          "name": "kyc_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "segment": {
+          "name": "segment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_customers_segment": {
+          "name": "idx_customers_segment",
+          "columns": [
+            {
+              "expression": "segment",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_customers_kyc": {
+          "name": "idx_customers_kyc",
+          "columns": [
+            {
+              "expression": "kyc_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_customers_search": {
+          "name": "idx_customers_search",
+          "columns": [
+            {
+              "expression": "to_tsvector('simple', \"full_name\" || ' ' || \"email\" || ' ' || \"city\" || ' ' || \"customer_id\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "customers_email_unique": {
+          "name": "customers_email_unique",
+          "nullsNotDistinct": false,
+          "columns": ["email"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "customers_kyc_status_check": {
+          "name": "customers_kyc_status_check",
+          "value": "\"customers\".\"kyc_status\" IN ('VERIFIED','PENDING','REVIEW')"
+        },
+        "customers_segment_check": {
+          "name": "customers_segment_check",
+          "value": "\"customers\".\"segment\" IN ('Mass','Affluent','HNI')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.instruments": {
+      "name": "instruments",
+      "schema": "",
+      "columns": {
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "symbol": {
+          "name": "symbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_name": {
+          "name": "instrument_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_class": {
+          "name": "asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sector": {
+          "name": "sector",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "exchange": {
+          "name": "exchange",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'INR'"
+        },
+        "last_price": {
+          "name": "last_price",
+          "type": "numeric(18, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_as_of": {
+          "name": "price_as_of",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "risk_band": {
+          "name": "risk_band",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "instruments_symbol_unique": {
+          "name": "instruments_symbol_unique",
+          "nullsNotDistinct": false,
+          "columns": ["symbol"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "instruments_asset_class_check": {
+          "name": "instruments_asset_class_check",
+          "value": "\"instruments\".\"asset_class\" IN ('EQUITY','ETF','MUTUAL_FUND','BOND','REIT','GSEC')"
+        },
+        "instruments_exchange_check": {
+          "name": "instruments_exchange_check",
+          "value": "\"instruments\".\"exchange\" IN ('NSE','BSE','OTC')"
+        },
+        "instruments_last_price_check": {
+          "name": "instruments_last_price_check",
+          "value": "\"instruments\".\"last_price\" >= 0"
+        },
+        "instruments_risk_band_check": {
+          "name": "instruments_risk_band_check",
+          "value": "\"instruments\".\"risk_band\" IN ('LOW','MEDIUM','HIGH')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.accounts": {
+      "name": "accounts",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_type": {
+          "name": "account_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opened_at": {
+          "name": "opened_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "base_currency": {
+          "name": "base_currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'INR'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_accounts_customer": {
+          "name": "idx_accounts_customer",
+          "columns": [
+            {
+              "expression": "customer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "accounts_customer_id_customers_customer_id_fk": {
+          "name": "accounts_customer_id_customers_customer_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "customers",
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["customer_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "accounts_account_type_check": {
+          "name": "accounts_account_type_check",
+          "value": "\"accounts\".\"account_type\" IN ('BROKERAGE','MUTUAL_FUND','RETIREMENT')"
+        },
+        "accounts_status_check": {
+          "name": "accounts_status_check",
+          "value": "\"accounts\".\"status\" IN ('ACTIVE','DORMANT','CLOSED')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.risk_profiles": {
+      "name": "risk_profiles",
+      "schema": "",
+      "columns": {
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "risk_score": {
+          "name": "risk_score",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "risk_level": {
+          "name": "risk_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "assessed_at": {
+          "name": "assessed_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "horizon_years": {
+          "name": "horizon_years",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "liquidity_need": {
+          "name": "liquidity_need",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "risk_profiles_customer_id_customers_customer_id_fk": {
+          "name": "risk_profiles_customer_id_customers_customer_id_fk",
+          "tableFrom": "risk_profiles",
+          "tableTo": "customers",
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["customer_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "risk_profiles_score_check": {
+          "name": "risk_profiles_score_check",
+          "value": "\"risk_profiles\".\"risk_score\" BETWEEN 0 AND 100"
+        },
+        "risk_profiles_level_check": {
+          "name": "risk_profiles_level_check",
+          "value": "\"risk_profiles\".\"risk_level\" IN ('Conservative','Moderate','Growth','Aggressive')"
+        },
+        "risk_profiles_horizon_check": {
+          "name": "risk_profiles_horizon_check",
+          "value": "\"risk_profiles\".\"horizon_years\" > 0"
+        },
+        "risk_profiles_liquidity_check": {
+          "name": "risk_profiles_liquidity_check",
+          "value": "\"risk_profiles\".\"liquidity_need\" IN ('LOW','MEDIUM','HIGH')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.goals": {
+      "name": "goals",
+      "schema": "",
+      "columns": {
+        "goal_id": {
+          "name": "goal_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "goal_type": {
+          "name": "goal_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "goal_name": {
+          "name": "goal_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_amount": {
+          "name": "target_amount",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_funded_amount": {
+          "name": "current_funded_amount",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "target_date": {
+          "name": "target_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priority": {
+          "name": "priority",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_goals_customer": {
+          "name": "idx_goals_customer",
+          "columns": [
+            {
+              "expression": "customer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "goals_customer_id_customers_customer_id_fk": {
+          "name": "goals_customer_id_customers_customer_id_fk",
+          "tableFrom": "goals",
+          "tableTo": "customers",
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["customer_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "goals_type_check": {
+          "name": "goals_type_check",
+          "value": "\"goals\".\"goal_type\" IN ('EMERGENCY_FUND','EDUCATION','RETIREMENT','TRAVEL','WEALTH_CREATION','HOME_PURCHASE')"
+        },
+        "goals_name_length_check": {
+          "name": "goals_name_length_check",
+          "value": "length(\"goals\".\"goal_name\") BETWEEN 3 AND 60"
+        },
+        "goals_target_amount_check": {
+          "name": "goals_target_amount_check",
+          "value": "\"goals\".\"target_amount\" > 0"
+        },
+        "goals_funded_amount_check": {
+          "name": "goals_funded_amount_check",
+          "value": "\"goals\".\"current_funded_amount\" >= 0"
+        },
+        "goals_priority_check": {
+          "name": "goals_priority_check",
+          "value": "\"goals\".\"priority\" IN ('LOW','MEDIUM','HIGH')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.holdings_snapshot": {
+      "name": "holdings_snapshot",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(18, 6)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avg_cost": {
+          "name": "avg_cost",
+          "type": "numeric(18, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_holdings_account": {
+          "name": "idx_holdings_account",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "holdings_snapshot_account_id_accounts_account_id_fk": {
+          "name": "holdings_snapshot_account_id_accounts_account_id_fk",
+          "tableFrom": "holdings_snapshot",
+          "tableTo": "accounts",
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["account_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "holdings_snapshot_instrument_id_instruments_instrument_id_fk": {
+          "name": "holdings_snapshot_instrument_id_instruments_instrument_id_fk",
+          "tableFrom": "holdings_snapshot",
+          "tableTo": "instruments",
+          "columnsFrom": ["instrument_id"],
+          "columnsTo": ["instrument_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "holdings_snapshot_account_id_instrument_id_snapshot_date_pk": {
+          "name": "holdings_snapshot_account_id_instrument_id_snapshot_date_pk",
+          "columns": ["account_id", "instrument_id", "snapshot_date"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "holdings_quantity_check": {
+          "name": "holdings_quantity_check",
+          "value": "\"holdings_snapshot\".\"quantity\" >= 0"
+        },
+        "holdings_avg_cost_check": {
+          "name": "holdings_avg_cost_check",
+          "value": "\"holdings_snapshot\".\"avg_cost\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.transactions": {
+      "name": "transactions",
+      "schema": "",
+      "columns": {
+        "transaction_id": {
+          "name": "transaction_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "transaction_type": {
+          "name": "transaction_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trade_date": {
+          "name": "trade_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(18, 6)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric(18, 4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_future": {
+          "name": "is_future",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "before_open_flag": {
+          "name": "before_open_flag",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "on_closed_flag": {
+          "name": "on_closed_flag",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "import_batch_id": {
+          "name": "import_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_tx_account_date": {
+          "name": "idx_tx_account_date",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "trade_date",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_tx_instrument": {
+          "name": "idx_tx_instrument",
+          "columns": [
+            {
+              "expression": "instrument_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"transactions\".\"instrument_id\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_tx_status": {
+          "name": "idx_tx_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_tx_is_future": {
+          "name": "idx_tx_is_future",
+          "columns": [
+            {
+              "expression": "is_future",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"transactions\".\"is_future\" = true",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_tx_batch": {
+          "name": "idx_tx_batch",
+          "columns": [
+            {
+              "expression": "import_batch_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"transactions\".\"import_batch_id\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "transactions_account_id_accounts_account_id_fk": {
+          "name": "transactions_account_id_accounts_account_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "accounts",
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["account_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "transactions_instrument_id_instruments_instrument_id_fk": {
+          "name": "transactions_instrument_id_instruments_instrument_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "instruments",
+          "columnsFrom": ["instrument_id"],
+          "columnsTo": ["instrument_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "transactions_import_batch_id_import_batches_batch_id_fk": {
+          "name": "transactions_import_batch_id_import_batches_batch_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "import_batches",
+          "columnsFrom": ["import_batch_id"],
+          "columnsTo": ["batch_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "transactions_type_check": {
+          "name": "transactions_type_check",
+          "value": "\"transactions\".\"transaction_type\" IN ('BUY','SELL','DIVIDEND','FEE')"
+        },
+        "transactions_quantity_check": {
+          "name": "transactions_quantity_check",
+          "value": "\"transactions\".\"quantity\" >= 0"
+        },
+        "transactions_price_check": {
+          "name": "transactions_price_check",
+          "value": "\"transactions\".\"price\" >= 0"
+        },
+        "transactions_status_check": {
+          "name": "transactions_status_check",
+          "value": "\"transactions\".\"status\" IN ('SETTLED','PENDING','REVERSED')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.import_batches": {
+      "name": "import_batches",
+      "schema": "",
+      "columns": {
+        "batch_id": {
+          "name": "batch_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "filename": {
+          "name": "filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imported_by": {
+          "name": "imported_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "received_at": {
+          "name": "received_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "row_count": {
+          "name": "row_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "imported_count": {
+          "name": "imported_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "duplicate_count": {
+          "name": "duplicate_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "rejected_count": {
+          "name": "rejected_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "future_dated_count": {
+          "name": "future_dated_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "duration_ms": {
+          "name": "duration_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'COMPLETED'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "import_batches_status_check": {
+          "name": "import_batches_status_check",
+          "value": "\"import_batches\".\"status\" IN ('COMPLETED','FAILED')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.import_rows": {
+      "name": "import_rows",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "batch_id": {
+          "name": "batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "line_number": {
+          "name": "line_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transaction_id": {
+          "name": "transaction_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "outcome": {
+          "name": "outcome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error_code": {
+          "name": "error_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_data": {
+          "name": "raw_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_import_rows_batch": {
+          "name": "idx_import_rows_batch",
+          "columns": [
+            {
+              "expression": "batch_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "import_rows_batch_id_import_batches_batch_id_fk": {
+          "name": "import_rows_batch_id_import_batches_batch_id_fk",
+          "tableFrom": "import_rows",
+          "tableTo": "import_batches",
+          "columnsFrom": ["batch_id"],
+          "columnsTo": ["batch_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "import_rows_outcome_check": {
+          "name": "import_rows_outcome_check",
+          "value": "\"import_rows\".\"outcome\" IN ('imported','future_dated','duplicate','rejected')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": ["email"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "users_role_check": {
+          "name": "users_role_check",
+          "value": "\"users\".\"role\" IN ('VIEWER','ADMIN')"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.v_monthly_net_flows": {
+      "columns": {
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "month": {
+          "name": "month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "buy_total": {
+          "name": "buy_total",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sell_total": {
+          "name": "sell_total",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "net_flow": {
+          "name": "net_flow",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n  SELECT\n    a.customer_id,\n    DATE_TRUNC('month', t.trade_date)::DATE                         AS month,\n    SUM(CASE WHEN t.transaction_type = 'BUY'  THEN t.amount ELSE 0 END)  AS buy_total,\n    SUM(CASE WHEN t.transaction_type = 'SELL' THEN t.amount ELSE 0 END)  AS sell_total,\n    SUM(CASE\n          WHEN t.transaction_type = 'SELL' THEN  t.amount\n          WHEN t.transaction_type = 'BUY'  THEN -t.amount\n          ELSE 0\n        END)                                                         AS net_flow\n  FROM transactions t\n  JOIN accounts a ON a.account_id = t.account_id\n  WHERE t.status          = 'SETTLED'\n    AND t.transaction_type IN ('BUY','SELL')\n    AND NOT t.is_future\n    AND t.trade_date >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '11 months'\n  GROUP BY a.customer_id, DATE_TRUNC('month', t.trade_date)\n",
+      "name": "v_monthly_net_flows",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_portfolio_positions": {
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "account_type": {
+          "name": "account_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "account_status": {
+          "name": "account_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "base_currency": {
+          "name": "base_currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "symbol": {
+          "name": "symbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instrument_name": {
+          "name": "instrument_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "asset_class": {
+          "name": "asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sector": {
+          "name": "sector",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "risk_band": {
+          "name": "risk_band",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_price": {
+          "name": "last_price",
+          "type": "numeric(18, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_as_of": {
+          "name": "price_as_of",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(18, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avg_cost": {
+          "name": "avg_cost",
+          "type": "numeric(18, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "market_value": {
+          "name": "market_value",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cost_basis": {
+          "name": "cost_basis",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unrealised_pnl": {
+          "name": "unrealised_pnl",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unrealised_pnl_pct": {
+          "name": "unrealised_pnl_pct",
+          "type": "numeric(18, 2)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n  SELECT\n    h.account_id,\n    a.customer_id,\n    a.account_type,\n    a.provider,\n    a.status                                                          AS account_status,\n    a.base_currency,\n    h.instrument_id,\n    i.symbol,\n    i.instrument_name,\n    i.asset_class,\n    i.sector,\n    i.risk_band,\n    i.last_price,\n    i.price_as_of,\n    h.quantity,\n    h.avg_cost,\n    h.snapshot_date,\n    ROUND(h.quantity * i.last_price,                           2)    AS market_value,\n    ROUND(h.quantity * h.avg_cost,                             2)    AS cost_basis,\n    ROUND(h.quantity * i.last_price - h.quantity * h.avg_cost, 2)    AS unrealised_pnl,\n    CASE WHEN h.avg_cost > 0\n      THEN ROUND((i.last_price - h.avg_cost) / h.avg_cost * 100, 2)\n      ELSE NULL\n    END                                                               AS unrealised_pnl_pct\n  FROM holdings_snapshot h\n  JOIN accounts    a ON a.account_id    = h.account_id\n  JOIN instruments i ON i.instrument_id = h.instrument_id\n",
+      "name": "v_portfolio_positions",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
