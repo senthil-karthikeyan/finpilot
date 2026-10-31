@@ -68,17 +68,16 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 export const api = {
-  get: <T>(url: string, options?: RequestInit) =>
-    request<T>(url, { ...options, method: 'GET' }),
+  get: <T>(url: string, options?: RequestInit) => request<T>(url, { ...options, method: 'GET' }),
 
-  post: <T>(url: string, body?: any, options?: RequestInit) =>
+  post: <T>(url: string, body?: unknown, options?: RequestInit) =>
     request<T>(url, {
       ...options,
       method: 'POST',
       body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
     }),
 
-  patch: <T>(url: string, body?: any, options?: RequestInit) =>
+  patch: <T>(url: string, body?: unknown, options?: RequestInit) =>
     request<T>(url, {
       ...options,
       method: 'PATCH',
@@ -88,4 +87,3 @@ export const api = {
   delete: <T>(url: string, options?: RequestInit) =>
     request<T>(url, { ...options, method: 'DELETE' }),
 };
-

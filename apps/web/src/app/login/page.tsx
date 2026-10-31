@@ -24,7 +24,7 @@ export default function LoginPage() {
     }
   }, [isAuthLoading, isAuthenticated, user, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -42,8 +42,9 @@ export default function LoginPage() {
     try {
       await login(email.trim(), password);
       toast.success('Signed in successfully');
-    } catch (err: any) {
-      setError(err?.message || 'Invalid email or password.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Something went wrong';
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -67,18 +68,14 @@ export default function LoginPage() {
         <div>
           <h1>Know where a customer&apos;s money stands.</h1>
           <p>
-            Portfolio value, goals, risk profile and recent activity for every
-            customer, in one place for the service team.
+            Portfolio value, goals, risk profile and recent activity for every customer, in one
+            place for the service team.
           </p>
         </div>
 
         <div>
           {/* Sample allocation visual strip */}
-          <div
-            className="strip"
-            role="img"
-            aria-label="Sample asset allocation indicator"
-          >
+          <div className="strip" role="img" aria-label="Sample asset allocation indicator">
             <i
               className="inline-block h-full transition-all"
               style={{ flex: 42, background: '#7f93e6' }}
@@ -210,8 +207,8 @@ export default function LoginPage() {
             </div>
 
             <p className="hint" style={{ marginTop: '10px' }}>
-              Viewers can browse and edit goals. Admins can also import data.
-              Authentication uses a secure httpOnly cookie session.
+              Viewers can browse and edit goals. Admins can also import data. Authentication uses a
+              secure httpOnly cookie session.
             </p>
           </div>
         </div>
@@ -219,4 +216,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
