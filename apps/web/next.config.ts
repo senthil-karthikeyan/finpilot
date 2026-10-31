@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
 
   // Transpile @finpilot/shared so Next.js bundles it directly from TypeScript
   transpilePackages: ["@finpilot/shared"],
+  output: "standalone",
 
   // ── Next.js 16 features ────────────────────────────────────────────────────
   cacheComponents: true,

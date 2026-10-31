@@ -10,7 +10,7 @@ FROM base AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# api's package.json stays only for the frozen-lockfile check
+# Manifests only for optimal layer caching
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages/shared/package.json ./packages/shared/
 COPY apps/web/package.json ./apps/web/
@@ -29,23 +29,20 @@ ENV API_URL=$API_URL
 RUN pnpm --filter @finpilot/shared build
 RUN pnpm --filter @finpilot/web build
 
-
-# Stage 2: runner
-FROM base AS runner
+# Stage 2: runner (minimal Node.js runtime without pnpm/build tools)
+FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY --from=builder /app/package.json /app/pnpm-workspace.yaml /app/pnpm-lock.yaml ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/shared ./packages/shared
-COPY --from=builder /app/apps/web ./apps/web
-
-WORKDIR /app/apps/web
+# Copy Next.js standalone output (traced production node_modules and server.js)
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 
 EXPOSE 3000
 
-# Call the local binary directly so npx never tries to hit the network
-CMD ["pnpm", "start"]
+# Start via the standalone server entry point
+CMD ["node", "apps/web/server.js"]
