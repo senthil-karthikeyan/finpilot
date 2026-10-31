@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Search, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { Search, ArrowUp, ArrowDown } from 'lucide-react';
 import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';

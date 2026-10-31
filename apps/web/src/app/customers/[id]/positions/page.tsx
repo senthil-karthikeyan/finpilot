@@ -2,7 +2,7 @@
 
 import React, { Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Info, RefreshCw, Loader2 } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';

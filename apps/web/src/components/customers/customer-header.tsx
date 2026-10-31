@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { fmtDate } from '@/lib/formatters';
@@ -13,12 +13,10 @@ interface CustomerHeaderProps {
 
 export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
   const { id, name, email, phone, city, state, segment, kycStatus, onboardedAt } = customer;
-  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const [targetTab, setTargetTab] = useState<string | null>(null);
 
-  // Clear pending state when active tab updates
-  useEffect(() => {
-    setPendingTab(null);
-  }, [activeTab]);
+  // Derived pending state: active until the route transition completes and activeTab matches
+  const pendingTab = targetTab !== activeTab ? targetTab : null;
 
   return (
     <>
@@ -58,7 +56,7 @@ export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
           href={`/customers/${id}`}
           aria-current={activeTab === 'overview' ? 'page' : undefined}
           onClick={() => {
-            if (activeTab !== 'overview') setPendingTab('overview');
+            if (activeTab !== 'overview') setTargetTab('overview');
           }}
         >
           <span>Overview</span>
@@ -71,7 +69,7 @@ export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
           href={`/customers/${id}/positions`}
           aria-current={activeTab === 'positions' ? 'page' : undefined}
           onClick={() => {
-            if (activeTab !== 'positions') setPendingTab('positions');
+            if (activeTab !== 'positions') setTargetTab('positions');
           }}
         >
           <span>Positions</span>
@@ -84,7 +82,7 @@ export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
           href={`/customers/${id}/transactions`}
           aria-current={activeTab === 'transactions' ? 'page' : undefined}
           onClick={() => {
-            if (activeTab !== 'transactions') setPendingTab('transactions');
+            if (activeTab !== 'transactions') setTargetTab('transactions');
           }}
         >
           <span>Transactions</span>
@@ -97,7 +95,7 @@ export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
           href={`/customers/${id}/goals`}
           aria-current={activeTab === 'goals' ? 'page' : undefined}
           onClick={() => {
-            if (activeTab !== 'goals') setPendingTab('goals');
+            if (activeTab !== 'goals') setTargetTab('goals');
           }}
         >
           <span>Goals</span>

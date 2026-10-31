@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, Target, AlertCircle, Pencil, Trash2, RefreshCw, Loader2 } from 'lucide-react';
+import { Plus, Target, AlertCircle, Pencil, Trash2 } from 'lucide-react';
 import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';
