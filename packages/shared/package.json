@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "Shared Zod schemas, API contract types, and constants used by both apps/api and apps/web.",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -26,4 +27,3 @@
     "zod": "^3.23.0"
   }
 }
-

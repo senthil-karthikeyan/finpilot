@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TRANSACTION_TYPES, TRANSACTION_STATUSES } from '../constants';
+import { TRANSACTION_TYPES, TRANSACTION_STATUSES } from '../constants/index.js';
 
 // ── Single transaction (used in list and detail responses) ───────────────────
 

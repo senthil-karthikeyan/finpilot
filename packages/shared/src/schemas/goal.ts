@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GOAL_TYPES, GOAL_PRIORITIES } from '../constants';
+import { GOAL_TYPES, GOAL_PRIORITIES } from '../constants/index.js';
 
 // ── Shared helper: calendar-date-only comparison ─────────────────────────────
 

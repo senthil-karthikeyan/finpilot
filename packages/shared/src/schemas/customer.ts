@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CUSTOMER_SEGMENTS, KYC_STATUSES, RISK_CATEGORIES } from '../constants';
+import { CUSTOMER_SEGMENTS, KYC_STATUSES, RISK_CATEGORIES } from '../constants/index.js';
 
 // ── Customer list item (used in GET /customers) ──────────────────────────────
 

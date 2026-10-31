@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_LIMIT, DEFAULT_PAGE, MAX_LIMIT } from '../constants';
+import { DEFAULT_LIMIT, DEFAULT_PAGE, MAX_LIMIT } from '../constants/index.js';
 
 // ── Pagination ───────────────────────────────────────────────────────────────
 

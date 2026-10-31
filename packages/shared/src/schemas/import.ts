@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IMPORT_OUTCOMES } from '../constants';
+import { IMPORT_OUTCOMES } from '../constants/index.js';
 
 // ── Per-row result (returned in import response and stored in import_rows) ────
 

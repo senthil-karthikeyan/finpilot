@@ -66,3 +66,8 @@ export const MAX_LIMIT = 100;
 /** Maximum CSV import file size (10 MB). */
 export const MAX_IMPORT_FILE_BYTES = 10 * 1024 * 1024;
 
+/** Authentication cookie name. */
+export const AUTH_COOKIE_NAME = 'finpilot_token';
+
+/** Authentication JWT expiration in seconds (8 hours). */
+export const JWT_EXPIRY_SECONDS = 28_800;

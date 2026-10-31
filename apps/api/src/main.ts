@@ -52,7 +52,11 @@ async function bootstrap() {
     .setTitle('FinPilot API')
     .setDescription('Internal investment portfolio and goal monitoring platform')
     .setVersion('1.0')
-    .addCookieAuth('access_token', { type: 'apiKey', in: 'cookie', name: 'access_token' })
+    .addCookieAuth('finpilot_token', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'finpilot_token',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

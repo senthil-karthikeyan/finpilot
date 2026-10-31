@@ -7,6 +7,9 @@ import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { DatabaseModule } from './database/database.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from './auth/guards/roles.guard.js';
 
 /**
  * AppModule — root module.
@@ -18,6 +21,9 @@ import { DatabaseModule } from './database/database.module.js';
   imports: [
     // ── Database — PostgreSQL via pg.Pool + Drizzle ORM (DRIZZLE_DB) ────────
     DatabaseModule,
+
+    // ── Authentication & Access Control ──────────────────────────────────────
+    AuthModule,
 
     // ── Config — makes process.env available across all modules ──────────────
     ConfigModule.forRoot({
@@ -65,6 +71,10 @@ import { DatabaseModule } from './database/database.module.js';
     AppService,
     // Apply the throttle guard globally so every route is rate-limited.
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    // Apply JWT authentication globally by default (routes opt out with @Public()).
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    // Apply role-based access control globally (routes specify roles with @Roles()).
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {}

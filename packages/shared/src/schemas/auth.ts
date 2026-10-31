@@ -16,7 +16,7 @@ export type LoginRequest = z.infer<typeof LoginRequestSchema>;
  * cookie — it is never exposed here.
  */
 export const AuthUserSchema = z.object({
-  id: z.string().uuid(),
+  id: z.union([z.string(), z.number()]),
   email: z.string().email(),
   name: z.string(),
   role: z.enum(['VIEWER', 'ADMIN']),
@@ -27,4 +27,3 @@ export const LoginResponseSchema = z.object({
   user: AuthUserSchema,
 });
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
-

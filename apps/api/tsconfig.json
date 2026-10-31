@@ -20,7 +20,7 @@
     "strictPropertyInitialization": false,
     "types": ["vitest/globals", "node"],
     "paths": {
-      "@finpilot/shared": ["../../packages/shared/src/index.ts"]
+      "@finpilot/shared": ["../../packages/shared/dist/index.d.ts"]
     }
   }
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ASSET_CLASSES, ACCOUNT_STATUSES } from '../constants';
+import { ASSET_CLASSES, ACCOUNT_STATUSES } from '../constants/index.js';
 
 // ── Portfolio position (one row from v_portfolio_positions) ──────────────────
 

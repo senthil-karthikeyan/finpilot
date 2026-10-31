@@ -1,10 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    // CommonJS output so both NestJS (CJS) and Next.js can consume it without
-    // extra bundler configuration.
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "target": "ES2022",
     "lib": ["ES2022"],
     "outDir": "./dist",
@@ -13,4 +11,3 @@
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
-
