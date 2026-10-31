@@ -6,6 +6,7 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { DatabaseModule } from './database/database.module.js';
 
 /**
  * AppModule — root module.
@@ -15,9 +16,12 @@ import { AppService } from './app.service.js';
  */
 @Module({
   imports: [
+    // ── Database — PostgreSQL via pg.Pool + Drizzle ORM (DRIZZLE_DB) ────────
+    DatabaseModule,
+
     // ── Config — makes process.env available across all modules ──────────────
     ConfigModule.forRoot({
-      isGlobal: true,   // no need to import ConfigModule in child modules
+      isGlobal: true, // no need to import ConfigModule in child modules
       cache: true,
     }),
 
@@ -27,7 +31,7 @@ import { AppService } from './app.service.js';
     ThrottlerModule.forRoot([
       {
         name: 'global',
-        ttl: 60_000,   // 60 seconds in milliseconds
+        ttl: 60_000, // 60 seconds in milliseconds
         limit: 100,
       },
     ]),
@@ -39,10 +43,17 @@ import { AppService } from './app.service.js';
         level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
         transport:
           process.env.NODE_ENV !== 'production'
-            ? { target: 'pino-pretty', options: { colorize: true, translateTime: 'SYS:HH:MM:ss' } }
+            ? {
+                target: 'pino-pretty',
+                options: { colorize: true, translateTime: 'SYS:HH:MM:ss' },
+              }
             : undefined,
         // Never log auth headers or cookie values — they contain the JWT.
-        redact: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
+        redact: [
+          'req.headers.authorization',
+          'req.headers.cookie',
+          'res.headers["set-cookie"]',
+        ],
         // Correlation ID is injected per-request in a later branch via AsyncLocalStorage.
         // The X-Correlation-Id response header is set there too.
         autoLogging: true,
