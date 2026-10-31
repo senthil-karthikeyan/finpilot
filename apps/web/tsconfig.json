@@ -1,26 +1,37 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
     "module": "esnext",
-    // "bundler" resolution works with Next.js Turbopack/webpack without needing file extensions.
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    // Required for React JSX (Next.js handles the JSX transform automatically).
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    // "preserve" is required by Next.js App Router (RSC, server actions).
+    // The CLI generates "react-jsx" but Next.js overrides it internally.
     "jsx": "preserve",
-    // Faster incremental builds in development.
     "incremental": true,
-    // Next.js ships its own plugin for better editor IDE integration.
     "plugins": [{ "name": "next" }],
     "paths": {
-      // @/* resolves to src/ — standard Next.js App Router convention.
+      // Standard Next.js App Router alias: @/* → src/*
       "@/*": ["./src/*"],
-      // Resolve shared package directly to source so builds are fast without pre-compiling shared.
+      // Resolve shared workspace package directly to TypeScript source.
+      // No need to pre-build @finpilot/shared in dev or CI for this app.
       "@finpilot/shared": ["../../packages/shared/src/index.ts"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
   "exclude": ["node_modules"]
 }
-

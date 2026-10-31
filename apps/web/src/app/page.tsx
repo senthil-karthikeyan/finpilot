@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 /**
  * The root path "/" simply redirects to the login page.
@@ -6,6 +6,5 @@ import { redirect } from 'next/navigation';
  * which are added in the web feature branches.
  */
 export default function Home() {
-  redirect('/login');
+  redirect("/login");
 }
-

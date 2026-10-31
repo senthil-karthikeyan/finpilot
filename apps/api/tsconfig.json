@@ -1,25 +1,26 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    // NestJS requires CommonJS modules and reflect-metadata support.
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "ES2021",
-    "lib": ["ES2021"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    // Decorators — required by NestJS (@Module, @Injectable, @Controller, etc.)
-    "experimentalDecorators": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
-    // Faster incremental builds
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": ".",
     "incremental": true,
-    // Path aliases: resolve @finpilot/shared directly to source in dev
-    // so the shared package does not need to be built before the API starts.
+    "skipLibCheck": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "types": ["vitest/globals", "node"],
     "paths": {
       "@finpilot/shared": ["../../packages/shared/src/index.ts"]
     }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
+  }
 }
-
