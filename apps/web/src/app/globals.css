@@ -656,6 +656,105 @@ dialog .actions,
 }
 .errsum { background: var(--loss-bg); color: #7d2118; padding: 10px 12px; border-radius: 5px; font-weight: 500; font-size: 13.5px; }
 
+/* ── Admin CSV Import & Data Quality ─────────────────────────────────────── */
+.drop {
+  border: 1.5px dashed #98a293;
+  border-radius: 6px;
+  padding: 26px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+  background: #f1f3ec;
+  transition: all 0.15s ease-in-out;
+}
+.drop.over {
+  border-color: var(--indigo);
+  background: var(--indigo-wash);
+}
+.stepper {
+  display: grid;
+  gap: 0;
+}
+.step {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  padding: 8px 0;
+  align-items: center;
+  color: var(--ink-3);
+}
+.step .mk {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  background: var(--surface);
+}
+.step.active {
+  color: var(--ink);
+  font-weight: 600;
+}
+.step.active .mk {
+  border-color: var(--indigo);
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+.step.done {
+  color: var(--ink);
+}
+.step.done .mk {
+  background: var(--gain);
+  border-color: var(--gain);
+  color: #fff;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.outcomes {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.outcomes > div {
+  flex: 1 1 150px;
+  padding: 16px 20px;
+  border-right: 1px solid var(--line-soft);
+}
+.outcomes > div:last-child {
+  border: 0;
+}
+.outcomes b {
+  display: block;
+  font: 400 42px/1.05 var(--font-display);
+}
+.outcomes span {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.tx-quarantine td {
+  background: #f9f2d8;
+}
+.linkbtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--indigo);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.linkbtn:hover {
+  color: var(--indigo-deep);
+}
+
 @media (max-width: 1100px) {
   .goal-row { grid-template-columns: minmax(0, 1fr) auto; }
   .goal-row .prog { grid-column: 1 / -1; order: 3; }

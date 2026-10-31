@@ -169,3 +169,15 @@ export function relFuture(iso: string | null | undefined): { text: string; late:
   if (d === 0) return { text: 'Due today', late: false };
   return { text: `In ${humanDays(d)}`, late: false };
 }
+
+
+/**
+ * Formats byte counts into human-readable file sizes (e.g. 45 KB, 2.3 MB).
+ */
+export function formatBytes(bytes: number | null | undefined): string {
+  if (!bytes || bytes <= 0 || isNaN(bytes)) return '0 KB';
+  if (bytes >= 1048576) {
+    return `${(bytes / 1048576).toFixed(1)} MB`;
+  }
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
