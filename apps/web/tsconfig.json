@@ -22,7 +22,7 @@
       "@/*": ["./src/*"],
       // Resolve shared workspace package directly to TypeScript source.
       // No need to pre-build @finpilot/shared in dev or CI for this app.
-      "@finpilot/shared": ["../../packages/shared/src/index.ts"]
+      "@finpilot/shared": ["../../packages/shared/dist/index.js"]
     }
   },
   "include": [
