@@ -1,0 +1,137 @@
+erDiagram
+  customers ||--o{ accounts : "owns"
+  customers ||--o| risk_profiles : "assessed with"
+  customers ||--o{ goals : "targets"
+  accounts ||--o{ holdings_snapshot : "maintains"
+  instruments ||--o{ holdings_snapshot : "held as"
+  accounts ||--o{ transactions : "executes"
+  instruments |o--o{ transactions : "references"
+  import_batches ||--o{ transactions : "originated from"
+  import_batches ||--o{ import_rows : "audits rows"
+
+  customers {
+    text customer_id PK
+    text email UK
+    text full_name
+    text phone
+    text city
+    text state
+    date date_of_birth
+    date onboarded_at
+    text kyc_status "CHECK in (VERIFIED, PENDING, REVIEW)"
+    text segment "CHECK in (Mass, Affluent, HNI)"
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  instruments {
+    text instrument_id PK
+    text symbol UK
+    text instrument_name
+    text asset_class "CHECK in (EQUITY, ETF, MUTUAL_FUND, BOND, REIT, GSEC)"
+    text sector
+    text exchange "CHECK in (NSE, BSE, OTC)"
+    text currency "DEFAULT 'INR'"
+    numeric last_price "CHECK >= 0"
+    date price_as_of
+    text risk_band "CHECK in (LOW, MEDIUM, HIGH)"
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  accounts {
+    text account_id PK
+    text customer_id FK
+    text account_type "CHECK in (BROKERAGE, MUTUAL_FUND, RETIREMENT)"
+    text provider
+    date opened_at
+    text status "CHECK in (ACTIVE, DORMANT, CLOSED)"
+    text base_currency "DEFAULT 'INR'"
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  risk_profiles {
+    text customer_id PK, FK
+    smallint risk_score "CHECK between 0 and 100"
+    text risk_level "CHECK in (Conservative, Moderate, Growth, Aggressive)"
+    date assessed_at
+    smallint horizon_years "CHECK > 0"
+    text liquidity_need "CHECK in (LOW, MEDIUM, HIGH)"
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  goals {
+    text goal_id PK
+    text customer_id FK
+    text goal_type "CHECK in (EMERGENCY_FUND, EDUCATION, RETIREMENT, TRAVEL, WEALTH_CREATION, HOME_PURCHASE)"
+    text goal_name "CHECK length 3..60"
+    numeric target_amount "CHECK > 0"
+    numeric current_funded_amount "DEFAULT 0, CHECK >= 0"
+    date target_date
+    text priority "CHECK in (LOW, MEDIUM, HIGH)"
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  holdings_snapshot {
+    text account_id PK, FK
+    text instrument_id PK, FK
+    date snapshot_date PK
+    numeric quantity "CHECK >= 0"
+    numeric avg_cost "CHECK >= 0"
+    timestamptz created_at
+  }
+
+  transactions {
+    text transaction_id PK
+    text account_id FK
+    text instrument_id FK "nullable for FEE/CASH"
+    text transaction_type "CHECK in (BUY, SELL, DIVIDEND, FEE)"
+    date trade_date
+    numeric quantity "CHECK >= 0"
+    numeric price "CHECK >= 0"
+    numeric amount
+    text status "CHECK in (SETTLED, PENDING, REVERSED)"
+    boolean is_future "DEFAULT false (in-ledger anomaly flag)"
+    boolean before_open_flag "DEFAULT false"
+    boolean on_closed_flag "DEFAULT false"
+    text import_batch_id FK "nullable"
+    timestamptz created_at
+  }
+
+  import_batches {
+    text batch_id PK
+    text filename
+    text imported_by
+    timestamptz received_at
+    integer row_count
+    integer imported_count
+    integer duplicate_count
+    integer rejected_count
+    integer future_dated_count
+    integer duration_ms
+    text status "CHECK in (COMPLETED, FAILED)"
+  }
+
+  import_rows {
+    bigserial id PK
+    text batch_id FK
+    integer line_number
+    text transaction_id
+    text outcome "CHECK in (imported, future_dated, duplicate, rejected)"
+    text error_code
+    text error_message
+    jsonb raw_data
+    timestamptz created_at
+  }
+
+  users {
+    bigserial id PK
+    text email UK
+    text name
+    text password_hash
+    text role "CHECK in (VIEWER, ADMIN)"
+    timestamptz created_at
+  }

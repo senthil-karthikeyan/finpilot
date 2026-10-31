@@ -1,0 +1,54 @@
+sequenceDiagram
+  autonumber
+  actor Admin as Operations Admin
+  participant UI as Import Page (/admin/imports)<br/>(import-dropzone.tsx, import-stepper.tsx)
+  participant Proxy as Next.js Server Proxy (/api/admin/...)
+  participant Controller as AdminController (apps/api)<br/>POST /admin/imports/transactions
+  participant Service as AdminService
+  participant Rules as Anomaly Detection Rules (anomaly-rules.ts)
+  participant DB as PostgreSQL 16 (Drizzle ORM)
+  participant TanStack as Client TanStack Query Cache
+
+  Admin->>UI: Selects & uploads transactions CSV file
+  UI->>UI: Client-side file format & size validation
+  UI->>Proxy: POST /api/admin/imports/transactions (multipart/form-data)
+  Note over Proxy: Extracts finpilot_token cookie<br/>Adds Authorization: Bearer <token>
+  Proxy->>Controller: POST /admin/imports/transactions (multipart/form-data)
+  
+  Note over Controller: Guards check: JwtAuthGuard & RolesGuard (@Roles('ADMIN'))
+  Controller->>Service: processTransactionImport(fileBuffer, adminUser)
+  
+  Service->>Service: Parse CSV lines using csv-parse
+  Service->>DB: Fetch valid account_ids, instrument_ids, and opened_at dates
+  DB-->>Service: Active accounts & instruments cache
+  
+  loop For Each CSV Row
+    Service->>Rules: reconcileTransactionRow(rawRow, accountContext, knownTxIds)
+    alt Natural Duplicate ID
+      Rules-->>Service: Outcome: 'duplicate' (Skip insertion, log audit)
+    else Invalid Instrument FK
+      Rules-->>Service: Outcome: 'rejected', Error: INVALID_INSTRUMENT_FK
+    else Negative Amount / Fee
+      Rules-->>Service: Outcome: 'rejected', Error: NEGATIVE_AMOUNT
+    else Future Trade Date (> 2026-10-31)
+      Rules-->>Service: Outcome: 'future_dated' (Flag is_future = true)
+    else Clean Record
+      Rules-->>Service: Outcome: 'imported' (Mark clean for ledger)
+    end
+  end
+
+  Note over Service,DB: Atomic Multi-Table Write Scope (ACID Transaction)
+  Service->>DB: BEGIN TRANSACTION
+  Service->>DB: INSERT INTO import_batches (batch_id, filename, imported_by, ...)
+  Service->>DB: Batch INSERT INTO transactions (clean + future_dated rows)
+  Service->>DB: Batch INSERT INTO import_rows (audit log of all row outcomes)
+  Service->>DB: UPDATE import_batches SET counts & duration_ms
+  Service->>DB: COMMIT TRANSACTION
+  
+  DB-->>Service: Transaction committed successfully
+  Service-->>Controller: BatchImportResultDto { batchId, importedCount, duplicateCount, rejectedCount, futureDatedCount, rows }
+  Controller-->>Proxy: 200 OK (Batch import JSON summary)
+  Proxy-->>UI: 200 OK Response
+  
+  UI->>TanStack: Invalidate ['admin', 'imports'] and ['admin', 'data-quality']
+  UI->>Admin: Render interactive results table, error badges, & quarantine CSV download

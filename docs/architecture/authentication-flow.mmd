@@ -1,0 +1,54 @@
+sequenceDiagram
+  autonumber
+  actor User as User / Browser
+  participant NextServer as Next.js App / Proxy (:3000)
+  participant NestApi as NestJS API (:3001)
+  participant PgDb as PostgreSQL (:5432)
+
+  %% 1. LOGIN FLOW
+  Note over User,PgDb: 1. Authentication & Session Establishment (Login)
+  User->>NextServer: POST /api/auth/login { email, password }
+  NextServer->>NestApi: Forward POST /auth/login { email, password }
+  NestApi->>PgDb: SELECT * FROM users WHERE email = $1
+  PgDb-->>NestApi: User record (bcrypt password_hash, role)
+  NestApi->>NestApi: bcrypt.compare(password, password_hash)
+  alt Invalid Credentials
+    NestApi-->>NextServer: 401 Unauthorized { message: "Invalid credentials" }
+    NextServer-->>User: 401 Unauthorized
+  else Valid Credentials
+    NestApi->>NestApi: Sign JWT (sub: id, email, role, exp: 8h)
+    NestApi-->>NextServer: 200 OK { accessToken: "eyJ...", user: { id, email, role } }
+    Note over NextServer: Store JWT in httpOnly Cookie (finpilot_token)
+    NextServer-->>User: 200 OK + Set-Cookie: finpilot_token=eyJ...; HttpOnly; SameSite=Lax
+  end
+
+  %% 2. PROTECTED REQUEST FLOW
+  Note over User,PgDb: 2. Protected Request via Next.js Server-Side Proxy
+  User->>NextServer: GET /api/customers/C0001/portfolio (Cookie: finpilot_token=eyJ...)
+  Note over NextServer: Proxy extracts cookie and sets Bearer Authorization header
+  NextServer->>NestApi: GET /customers/C0001/portfolio<br/>Authorization: Bearer eyJ...
+  NestApi->>NestApi: JwtAuthGuard validates token signature & expiry
+  alt Expired or Tampered Token
+    NestApi-->>NextServer: 401 Unauthorized
+    NextServer-->>User: 401 Unauthorized
+    Note over User: TanStack Query catches 401 -> Sonner toast -> Redirect to /login
+  else Token Valid & Authorized
+    NestApi->>NestApi: RolesGuard checks user.role permissions
+    NestApi->>PgDb: Query portfolio data & views
+    PgDb-->>NestApi: Rows returned
+    NestApi-->>NextServer: 200 OK { portfolioSummary, accounts, positions }
+    NextServer-->>User: 200 OK JSON payload
+  end
+
+  %% 3. SWAGGER FLOW
+  Note over User,PgDb: 3. Direct Swagger / API Access
+  User->>NestApi: GET /customers/C0001/portfolio (No Token)
+  NestApi-->>User: 401 Unauthorized
+  User->>NestApi: Authorize with pasted token -> GET /customers/C0001/portfolio<br/>Authorization: Bearer eyJ...
+  NestApi-->>User: 200 OK
+
+  %% 4. LOGOUT FLOW
+  Note over User,PgDb: 4. Session Termination (Logout)
+  User->>NextServer: POST /logout
+  Note over NextServer: Clear finpilot_token cookie (Max-Age=0)
+  NextServer-->>User: 302 Redirect /login + Set-Cookie: finpilot_token=; Max-Age=0

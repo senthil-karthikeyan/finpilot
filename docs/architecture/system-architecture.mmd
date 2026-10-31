@@ -1,0 +1,98 @@
+flowchart TD
+  subgraph ClientTier ["Client Tier (Browser)"]
+    Browser["Web Browser (Wealth Ops / Admin)"]
+    ClientStorage["Client State (Memory Only / TanStack Query Cache)"]
+    Browser <--> ClientStorage
+  end
+
+  subgraph FrontendTier ["Frontend Application Tier (apps/web :3000)"]
+    direction TB
+    NextServer["Next.js 16 Server (Node.js 22 Runtime)"]
+    AppRouter["React 19 App Router (PPR & Server Components)"]
+    CookieStore["Session Cookie Handler (httpOnly, SameSite=Lax)"]
+    ApiProxy["Server-Side API Proxy (/api/[...path])"]
+    
+    NextServer --> AppRouter
+    NextServer --> CookieStore
+    NextServer --> ApiProxy
+  end
+
+  subgraph SharedTier ["Shared Contracts Tier (packages/shared)"]
+    SharedPkg["@finpilot/shared"]
+    ZodSchemas["Zod Validation Schemas"]
+    ContractTypes["TypeScript DTO & API Interfaces"]
+    DomainConstants["Domain Constants & Enums"]
+    SharedPkg --- ZodSchemas
+    SharedPkg --- ContractTypes
+    SharedPkg --- DomainConstants
+  end
+
+  subgraph BackendTier ["Backend API Tier (apps/api :3001)"]
+    direction TB
+    NestApp["NestJS 12 Application (Modular Architecture)"]
+    
+    subgraph SecurityPipeline ["Security & Ingress Pipeline"]
+      Throttler["Throttler Guard (Rate Limiting)"]
+      CorsMiddleware["CORS Middleware (Allowed Origins)"]
+      JwtGuard["JwtAuthGuard (Passport Bearer Auth)"]
+      RolesGuard["RolesGuard (VIEWER / ADMIN RBAC)"]
+      ValidationPipe["Global ValidationPipe (class-validator)"]
+    end
+    
+    subgraph ApiModules ["Domain Modules & Controllers"]
+      AuthMod["AuthModule (/auth/login)"]
+      CustMod["CustomersModule (/customers)"]
+      PortMod["PortfolioModule (/customers/:id/portfolio)"]
+      TxMod["TransactionsModule (/customers/:id/transactions)"]
+      GoalMod["GoalsModule (/customers/:id/goals, /goals/:id)"]
+      AdminMod["AdminModule (/admin/imports, /admin/data-quality)"]
+      HealthMod["HealthModule (/health)"]
+    end
+
+    subgraph DataAccessLayer ["Data Access Layer"]
+      DrizzleORM["Drizzle ORM (Type-Safe Query Builder)"]
+      PgPool["PostgreSQL Connection Pool (pg.Pool)"]
+    end
+
+    NestApp --> SecurityPipeline
+    SecurityPipeline --> ApiModules
+    ApiModules --> DataAccessLayer
+    DataAccessLayer --> DrizzleORM
+    DrizzleORM --> PgPool
+  end
+
+  subgraph DatabaseTier ["Persistence Tier (postgres :5432)"]
+    direction TB
+    PgServer["PostgreSQL 16 Relational Engine"]
+    
+    subgraph CoreTables ["Normalized Schema Tables"]
+      UsersTab[("users")]
+      CustTab[("customers")]
+      AccTab[("accounts")]
+      InstTab[("instruments")]
+      RiskTab[("risk_profiles")]
+      HoldTab[("holdings_snapshot")]
+      TxTab[("transactions")]
+      GoalsTab[("goals")]
+      BatchTab[("import_batches")]
+      RowsTab[("import_rows")]
+    end
+
+    subgraph DatabaseViews ["Materialized / Aggregation Views"]
+      VPositions["v_portfolio_positions"]
+      VNetFlows["v_monthly_net_flows"]
+    end
+
+    PgServer --> CoreTables
+    PgServer --> DatabaseViews
+  end
+
+  %% Interactions
+  Browser -- "1. HTTP / HTML / PPR Chunks" --> NextServer
+  Browser -- "2. Same-Origin API Requests (Cookie included)" --> ApiProxy
+  ApiProxy -- "3. Proxied REST API Call (Authorization: Bearer <jwt>)" --> NestApp
+
+  AppRouter -. "Uses Schemas & Types" .-> SharedPkg
+  NestApp -. "Uses Schemas & Types" .-> SharedPkg
+
+  PgPool -- "4. Parameterized SQL Queries & Pool Connections" --> PgServer
