@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import type { AuthUser } from '@finpilot/shared';
+import type { AuthUser, LoginResponse } from '@finpilot/shared';
 import { api, ApiError } from '@/lib/api-client';
 import { getSafeRedirectUrl } from '@/lib/auth-error-handler';
 
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryFn: async () => {
       try {
         const res = await api.get<{ user?: AuthUser } | AuthUser>('/api/v1/auth/me');
-        if ('user' in res && res.user) {
+        if (res && typeof res === 'object' && 'user' in res && res.user) {
           return res.user;
         }
         return res as AuthUser;
@@ -52,11 +52,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string, nextPath?: string) => {
-      const res = await api.post<{ user?: AuthUser } | AuthUser>('/api/v1/auth/login', {
-        email,
-        password,
-      });
-      const authUser = 'user' in res && res.user ? res.user : (res as AuthUser);
+      const res = await api.post<LoginResponse | { user?: AuthUser } | AuthUser>(
+        '/api/v1/auth/login',
+        {
+          email,
+          password,
+        },
+      );
+      const authUser =
+        res && typeof res === 'object' && 'user' in res && res.user
+          ? res.user
+          : (res as AuthUser);
+
       // Clear query cache on login
       queryClient.clear();
       queryClient.setQueryData(['auth-me'], authUser);

@@ -29,8 +29,13 @@ async function handleProxy(
       }
 
       // Store JWT token in secure httpOnly cookie on frontend origin
+      // Return accessToken, token, and user for API contract compatibility
       const response = NextResponse.json(
-        { user: resData.user },
+        {
+          accessToken: resData.accessToken || resData.token,
+          token: resData.token || resData.accessToken,
+          user: resData.user,
+        },
         { status: backendRes.status },
       );
 
@@ -168,4 +173,3 @@ export async function DELETE(
   const { path } = await context.params;
   return handleProxy(request, path);
 }
-
