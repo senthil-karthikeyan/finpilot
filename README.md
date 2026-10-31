@@ -100,14 +100,13 @@ finpilot/
 │   ├── queries/                    # Reviewer SQL analysis queries (AUM, flows, etc.)
 │   └── seed/                       # Raw synthetic CSV data files and seed documentation
 ├── docs/
-│   ├── architecture/               # Architecture diagrams (.png, .mmd) and README
+│   ├── architecture/               # Architecture diagrams (.png) and README
 │   │   ├── system-architecture.png # Overall topology diagram
 │   │   ├── database-erd.png        # Relational database ERD
 │   │   ├── backend-request-flow.png# NestJS request pipeline flowchart
 │   │   ├── authentication-flow.png # Session, cookie proxy, and JWT lifecycle
 │   │   ├── full-stack-data-flow.png# End-to-end CSV ingestion trace
-│   │   ├── README.md               # Architecture documentation guide
-│   │   └── *.mmd                   # Editable Mermaid source specifications
+│   │   └── README.md               # Architecture documentation guide
 │   └── IMPLEMENTATION_PLAN.md      # Detailed engineering requirements & anomaly audit
 ├── docker-compose.yml              # Local container orchestration with healthchecks
 ├── DECISIONS.md                    # Architecture Decision Records (ADRs) & rejected proposals
@@ -124,7 +123,7 @@ FinPilot employs a defense-in-depth architecture separating client state, fronte
 ![System Architecture](docs/architecture/system-architecture.png)
 
 > [!NOTE]
-> For detailed flowcharts of the database schema, backend request pipeline, authentication lifecycle, and full-stack data trace, see [docs/architecture/README.md](./docs/architecture/README.md). Editable Mermaid source is maintained in [`docs/architecture/system-architecture.mmd`](./docs/architecture/system-architecture.mmd).
+> For detailed flowcharts of the database schema, backend request pipeline, authentication lifecycle, and full-stack data trace, see [docs/architecture/README.md](./docs/architecture/README.md).
 
 ---
 
@@ -430,11 +429,11 @@ pnpm -r build
 ## 12. Architecture Documentation & Decision Log
 
 - **Comprehensive Architecture Documentation:** [`docs/architecture/README.md`](./docs/architecture/README.md)
-  - [System Topology Diagram (PNG)](./docs/architecture/system-architecture.png) ([`.mmd source`](./docs/architecture/system-architecture.mmd))
-  - [Database Entity Relationship Diagram (ERD) (PNG)](./docs/architecture/database-erd.png) ([`.mmd source`](./docs/architecture/database-erd.mmd))
-  - [Backend Request Lifecycle Diagram (PNG)](./docs/architecture/backend-request-flow.png) ([`.mmd source`](./docs/architecture/backend-request-flow.mmd))
-  - [Authentication & Authorization Lifecycle Diagram (PNG)](./docs/architecture/authentication-flow.png) ([`.mmd source`](./docs/architecture/authentication-flow.mmd))
-  - [Full-Stack Data Persistence Flow Diagram (PNG)](./docs/architecture/full-stack-data-flow.png) ([`.mmd source`](./docs/architecture/full-stack-data-flow.mmd))
+  - [System Topology Diagram (PNG)](./docs/architecture/system-architecture.png)
+  - [Database Entity Relationship Diagram (ERD) (PNG)](./docs/architecture/database-erd.png)
+  - [Backend Request Lifecycle Diagram (PNG)](./docs/architecture/backend-request-flow.png)
+  - [Authentication & Authorization Lifecycle Diagram (PNG)](./docs/architecture/authentication-flow.png)
+  - [Full-Stack Data Persistence Flow Diagram (PNG)](./docs/architecture/full-stack-data-flow.png)
 - **Architecture Decision Records (ADRs):** [`DECISIONS.md`](./DECISIONS.md)
   - Includes full rationale for session cookie proxying, pure Bearer API auth, in-ledger anomaly flags vs. quarantine tables (**REJECTED**), numeric precision, and Next.js standalone container optimization.
 - **Database Migrations & SQL Analysis Queries:** [`db/README.md`](./db/README.md)

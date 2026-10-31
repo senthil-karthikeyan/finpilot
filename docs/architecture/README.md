@@ -6,13 +6,13 @@ This directory contains the architecture specifications, component breakdowns, d
 
 ## Architecture Diagrams Index
 
-| #   | Diagram                                                                                   | Image Preview                                            | Editable Source                                          | Description                                                                                          |
+| #   | Diagram                                                                                   | Image Preview                                            | Description                                                                                          |
 | --- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 1   | [Overall System Architecture](#1-overall-system-architecture)                             | [`system-architecture.png`](./system-architecture.png)   | [`system-architecture.mmd`](./system-architecture.mmd)   | High-level topology across browser, frontend proxy, shared contracts, NestJS API, and PostgreSQL     |
-| 2   | [Database Entity Relationship Diagram (ERD)](#2-database-entity-relationship-diagram-erd) | [`database-erd.png`](./database-erd.png)                 | [`database-erd.mmd`](./database-erd.mmd)                 | Relational database schema, keys, foreign keys, cardinality, and constraints                         |
-| 3   | [Backend Request Lifecycle](#3-backend-request-lifecycle)                                 | [`backend-request-flow.png`](./backend-request-flow.png) | [`backend-request-flow.mmd`](./backend-request-flow.mmd) | Ingress guards, throttling, JWT verification, role authorization, validation, ORM, and error filters |
-| 4   | [Authentication & Authorization Flow](#4-authentication--authorization-flow)              | [`authentication-flow.png`](./authentication-flow.png)   | [`authentication-flow.mmd`](./authentication-flow.mmd)   | Login, bcrypt verification, JWT signing, httpOnly cookie proxying, Swagger bearer auth, and logout   |
-| 5   | [Full-Stack Data Persistence Flow](#5-full-stack-data-persistence-flow)                   | [`full-stack-data-flow.png`](./full-stack-data-flow.png) | [`full-stack-data-flow.mmd`](./full-stack-data-flow.mmd) | End-to-end trace of CSV transaction ingestion, anomaly rules, ACID transaction, and audit logging    |
+| 1   | [Overall System Architecture](#1-overall-system-architecture)                             | [`system-architecture.png`](./system-architecture.png)   | High-level topology across browser, frontend proxy, shared contracts, NestJS API, and PostgreSQL |
+| 2   | [Database Entity Relationship Diagram (ERD)](#2-database-entity-relationship-diagram-erd) | [`database-erd.png`](./database-erd.png)                 | Relational database schema, keys, foreign keys, cardinality, and constraints |
+| 3   | [Backend Request Lifecycle](#3-backend-request-lifecycle)                                 | [`backend-request-flow.png`](./backend-request-flow.png) | Ingress guards, throttling, JWT verification, role authorization, validation, ORM, and error filters |
+| 4   | [Authentication & Authorization Flow](#4-authentication--authorization-flow)              | [`authentication-flow.png`](./authentication-flow.png)   | Login, bcrypt verification, JWT signing, httpOnly cookie proxying, Swagger bearer auth, and logout |
+| 5   | [Full-Stack Data Persistence Flow](#5-full-stack-data-persistence-flow)                   | [`full-stack-data-flow.png`](./full-stack-data-flow.png) | End-to-end trace of CSV transaction ingestion, anomaly rules, ACID transaction, and audit logging |
 
 ---
 
@@ -32,8 +32,6 @@ FinPilot is structured as a pnpm monorepo separating concern into:
 
 ![Overall System Architecture](./system-architecture.png)
 
-> [!NOTE]
-> Editable Mermaid source specification: [`system-architecture.mmd`](./system-architecture.mmd)
 
 ---
 
@@ -66,8 +64,6 @@ The database schema consists of 10 primary relational tables designed for operat
 
 ![Database Entity Relationship Diagram (ERD)](./database-erd.png)
 
-> [!NOTE]
-> Editable Mermaid source specification: [`database-erd.mmd`](./database-erd.mmd)
 
 ---
 
@@ -89,8 +85,6 @@ Every request sent to the NestJS API passes through a predictable, ordered serie
 
 ![Backend Request Lifecycle](./backend-request-flow.png)
 
-> [!NOTE]
-> Editable Mermaid source specification: [`backend-request-flow.mmd`](./backend-request-flow.mmd)
 
 ---
 
@@ -109,8 +103,6 @@ FinPilot implements a secure, defense-in-depth authentication model designed to 
 
 ![Authentication & Authorization Flow](./authentication-flow.png)
 
-> [!NOTE]
-> Editable Mermaid source specification: [`authentication-flow.mmd`](./authentication-flow.mmd)
 
 ---
 
@@ -134,17 +126,15 @@ This diagram traces a full end-to-end data lifecycle using the **Operations CSV 
 
 ![Full-Stack Data Persistence Flow](./full-stack-data-flow.png)
 
-> [!NOTE]
-> Editable Mermaid source specification: [`full-stack-data-flow.mmd`](./full-stack-data-flow.mmd)
 
 ---
 
-## Exported Architecture Diagrams & Source Files
+## Exported Architecture Diagrams
 
-| # | Architecture Diagram | Exported Diagram (PNG) | Editable Source File (.mmd) |
-|---|---|---|---|
-| 1 | Overall System Topology | [`system-architecture.png`](./system-architecture.png) | [`system-architecture.mmd`](./system-architecture.mmd) |
-| 2 | Database Entity Relationship Diagram (ERD) | [`database-erd.png`](./database-erd.png) | [`database-erd.mmd`](./database-erd.mmd) |
-| 3 | Backend Request Pipeline & Ingress | [`backend-request-flow.png`](./backend-request-flow.png) | [`backend-request-flow.mmd`](./backend-request-flow.mmd) |
-| 4 | Authentication & Authorization Lifecycle | [`authentication-flow.png`](./authentication-flow.png) | [`authentication-flow.mmd`](./authentication-flow.mmd) |
-| 5 | Full-Stack Data Persistence & CSV Trace | [`full-stack-data-flow.png`](./full-stack-data-flow.png) | [`full-stack-data-flow.mmd`](./full-stack-data-flow.mmd) |
+| # | Architecture Diagram | Diagram File (PNG) |
+|---|---|---|
+| 1 | Overall System Topology | [`system-architecture.png`](./system-architecture.png) |
+| 2 | Database Entity Relationship Diagram (ERD) | [`database-erd.png`](./database-erd.png) |
+| 3 | Backend Request Pipeline & Ingress | [`backend-request-flow.png`](./backend-request-flow.png) |
+| 4 | Authentication & Authorization Lifecycle | [`authentication-flow.png`](./authentication-flow.png) |
+| 5 | Full-Stack Data Persistence & CSV Trace | [`full-stack-data-flow.png`](./full-stack-data-flow.png) |
