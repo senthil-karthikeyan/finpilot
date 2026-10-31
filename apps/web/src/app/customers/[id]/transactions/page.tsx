@@ -2,7 +2,8 @@
 
 import React, { useState, useTransition, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Search, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';
 import { ProtectedRoute } from '@/components/auth/protected-route';
@@ -60,6 +61,7 @@ function TransactionsContent() {
     error: txError,
     refetch: refetchTx,
     isPlaceholderData,
+    isFetching: isTxFetching,
   } = useCustomerTransactions(id, {
     accountId: accountId || undefined,
     transactionType: transactionType || undefined,
@@ -358,7 +360,7 @@ function TransactionsContent() {
 
             {/* Transactions Ledger Panel */}
             <div className="panel">
-              <div id="tx-region" aria-live="polite" aria-busy={isTxLoading}>
+              <div id="tx-region" aria-live="polite" aria-busy={isTxLoading || isTxFetching}>
                 {isTxLoading && !txResponse ? (
                   <div className="p-5" role="status" aria-label="Loading transactions">
                     {Array.from({ length: 8 }).map((_, i) => (
@@ -379,7 +381,8 @@ function TransactionsContent() {
                   </div>
                 ) : (
                   <>
-                    <div className="tablewrap" style={{ opacity: isPlaceholderData ? 0.7 : 1 }}>
+                    <div className="tablewrap relative" style={{ opacity: isTxFetching || isPlaceholderData ? 0.65 : 1, transition: 'opacity 0.15s ease' }}>
+                      <TableLoadingBar isFetching={isTxFetching} message="Updating transactions..." />
                       <table className="tbl">
                         <caption className="sr-only">
                           Transactions, page {txResponse.meta.page} of {txResponse.meta.totalPages}

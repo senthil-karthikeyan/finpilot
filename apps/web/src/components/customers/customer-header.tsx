@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import { fmtDate } from '@/lib/formatters';
 import type { CustomerDetail } from '@finpilot/shared';
 
@@ -12,6 +13,12 @@ interface CustomerHeaderProps {
 
 export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
   const { id, name, email, phone, city, state, segment, kycStatus, onboardedAt } = customer;
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+
+  // Clear pending state when active tab updates
+  useEffect(() => {
+    setPendingTab(null);
+  }, [activeTab]);
 
   return (
     <>
@@ -47,35 +54,58 @@ export function CustomerHeader({ customer, activeTab }: CustomerHeaderProps) {
 
       <nav className="tabs" aria-label="Customer sections">
         <Link
-          className="tab"
+          className="tab inline-flex items-center gap-1.5"
           href={`/customers/${id}`}
           aria-current={activeTab === 'overview' ? 'page' : undefined}
+          onClick={() => {
+            if (activeTab !== 'overview') setPendingTab('overview');
+          }}
         >
-          Overview
+          <span>Overview</span>
+          {pendingTab === 'overview' && (
+            <Loader2 className="w-3 h-3 animate-spin text-[var(--indigo)]" />
+          )}
         </Link>
         <Link
-          className="tab"
+          className="tab inline-flex items-center gap-1.5"
           href={`/customers/${id}/positions`}
           aria-current={activeTab === 'positions' ? 'page' : undefined}
+          onClick={() => {
+            if (activeTab !== 'positions') setPendingTab('positions');
+          }}
         >
-          Positions
+          <span>Positions</span>
+          {pendingTab === 'positions' && (
+            <Loader2 className="w-3 h-3 animate-spin text-[var(--indigo)]" />
+          )}
         </Link>
         <Link
-          className="tab"
+          className="tab inline-flex items-center gap-1.5"
           href={`/customers/${id}/transactions`}
           aria-current={activeTab === 'transactions' ? 'page' : undefined}
+          onClick={() => {
+            if (activeTab !== 'transactions') setPendingTab('transactions');
+          }}
         >
-          Transactions
+          <span>Transactions</span>
+          {pendingTab === 'transactions' && (
+            <Loader2 className="w-3 h-3 animate-spin text-[var(--indigo)]" />
+          )}
         </Link>
         <Link
-          className="tab"
+          className="tab inline-flex items-center gap-1.5"
           href={`/customers/${id}/goals`}
           aria-current={activeTab === 'goals' ? 'page' : undefined}
+          onClick={() => {
+            if (activeTab !== 'goals') setPendingTab('goals');
+          }}
         >
-          Goals
+          <span>Goals</span>
+          {pendingTab === 'goals' && (
+            <Loader2 className="w-3 h-3 animate-spin text-[var(--indigo)]" />
+          )}
         </Link>
       </nav>
     </>
   );
 }
-

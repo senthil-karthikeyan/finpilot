@@ -9,9 +9,14 @@ import type { Goal } from '@finpilot/shared';
 interface GoalsPreviewCardProps {
   customerId: string;
   goals: Goal[];
+  isLoading?: boolean;
 }
 
-export function GoalsPreviewCard({ customerId, goals }: GoalsPreviewCardProps) {
+export function GoalsPreviewCard({
+  customerId,
+  goals,
+  isLoading = false,
+}: GoalsPreviewCardProps) {
   // Sort goals by priority then progress
   const priorityOrder = { HIGH: 0, MEDIUM: 1, LOW: 2 };
   const sortedGoals = [...goals].sort(
@@ -32,7 +37,12 @@ export function GoalsPreviewCard({ customerId, goals }: GoalsPreviewCardProps) {
       </div>
 
       <div className="rows">
-        {displayGoals.length ? (
+        {isLoading ? (
+          <div className="p-4 space-y-3" role="status" aria-label="Loading goals">
+            <div className="skel" style={{ height: '38px' }} />
+            <div className="skel" style={{ height: '38px' }} />
+          </div>
+        ) : displayGoals.length ? (
           displayGoals.map((g) => {
             const typeLabel =
               GOAL_TYPE_LABELS[g.goalType || g.type] || cap(g.goalType || g.type);
@@ -93,4 +103,3 @@ export function GoalsPreviewCard({ customerId, goals }: GoalsPreviewCardProps) {
     </section>
   );
 }
-

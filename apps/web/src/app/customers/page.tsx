@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useTransition, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';
 import { ProtectedRoute } from '@/components/auth/protected-route';
@@ -64,7 +65,7 @@ function CustomersDirectoryContent() {
   }, [debouncedSearch, segment, kycStatus, sortBy, sortDir, page, limit, router]);
 
   // Query customers using TanStack Query
-  const { data, isLoading, isError, error, refetch, isPlaceholderData } = useCustomers({
+  const { data, isLoading, isError, error, refetch, isPlaceholderData, isFetching } = useCustomers({
     search: debouncedSearch,
     segment,
     kycStatus,
@@ -74,6 +75,7 @@ function CustomersDirectoryContent() {
     sortDir,
   });
 
+  const isSearching = searchInput !== debouncedSearch || (isFetching && Boolean(debouncedSearch.trim()));
   const hasActiveFilters = Boolean(debouncedSearch.trim() || segment || kycStatus);
 
   const resetFilters = () => {
@@ -118,7 +120,11 @@ function CustomersDirectoryContent() {
           <div className="field" style={{ gridColumn: 'span 2' }}>
             <label htmlFor="q">Search</label>
             <div className="searchbox">
-              <Search className="w-4 h-4 ico" aria-hidden="true" />
+              {isSearching ? (
+                <Loader2 className="w-4 h-4 ico animate-spin text-[var(--indigo)]" aria-hidden="true" />
+              ) : (
+                <Search className="w-4 h-4 ico" aria-hidden="true" />
+              )}
               <input
                 className="input"
                 id="q"
@@ -195,7 +201,7 @@ function CustomersDirectoryContent() {
 
       {/* Customer Table Panel */}
       <div className="panel" style={{ marginTop: '20px' }}>
-        <div id="cust-region" aria-live="polite" aria-busy={isLoading}>
+        <div id="cust-region" aria-live="polite" aria-busy={isLoading || isFetching}>
           {isLoading && !data ? (
             /* Shimmer Skeleton rows matching mock skelRows(9) */
             <div className="p-5" role="status" aria-label="Loading customers">
@@ -233,7 +239,8 @@ function CustomersDirectoryContent() {
           ) : (
             /* Table matching mock design and typography */
             <>
-              <div className="tablewrap" style={{ opacity: isPlaceholderData ? 0.7 : 1 }}>
+              <div className="tablewrap relative" style={{ opacity: isFetching || isPlaceholderData ? 0.65 : 1, transition: 'opacity 0.15s ease' }}>
+                <TableLoadingBar isFetching={isFetching && !isLoading} message="Loading customers..." />
                 <table className="tbl">
                   <caption className="sr-only">
                     Customers, page {data.meta.page} of {data.meta.totalPages}

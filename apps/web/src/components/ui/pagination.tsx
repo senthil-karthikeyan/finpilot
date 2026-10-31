@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { fmtCount } from '@/lib/formatters';
 
 export interface PaginationProps {
@@ -11,6 +11,7 @@ export interface PaginationProps {
   pageSize?: number;
   limit?: number;
   pageSizeOptions?: number[];
+  isFetching?: boolean;
   onPageChange: (newPage: number) => void;
   onLimitChange: (newLimit: number) => void;
 }
@@ -22,6 +23,7 @@ export function Pagination({
   pageSize,
   limit,
   pageSizeOptions = [20, 50, 100],
+  isFetching = false,
   onPageChange,
   onLimitChange,
 }: PaginationProps) {
@@ -41,15 +43,26 @@ export function Pagination({
 
   return (
     <nav className="pager" aria-label="Pagination">
-      <span className="text-[13px] text-[var(--ink-2)]" id="pagination-summary">
-        Showing {fmtCount(from)}–{fmtCount(to)} of {fmtCount(total)}
-      </span>
+      <div className="flex items-center gap-2">
+        <span className="text-[13px] text-[var(--ink-2)]" id="pagination-summary">
+          Showing {fmtCount(from)}–{fmtCount(to)} of {fmtCount(total)}
+        </span>
+        {isFetching && (
+          <span
+            className="inline-flex items-center gap-1 text-[11px] text-[var(--ink-3)] animate-pulse"
+            aria-live="polite"
+          >
+            <Loader2 className="w-3 h-3 animate-spin text-[var(--indigo)]" />
+            <span>updating...</span>
+          </span>
+        )}
+      </div>
 
       <div className="pages">
         <button
           type="button"
           className="pg"
-          disabled={page <= 1}
+          disabled={page <= 1 || isFetching}
           onClick={() => onPageChange(page - 1)}
           aria-label="Previous page"
         >
@@ -66,6 +79,7 @@ export function Pagination({
               key={`page-${item}`}
               type="button"
               className="pg"
+              disabled={isFetching}
               aria-current={item === page ? 'page' : undefined}
               aria-label={`Page ${item}`}
               onClick={() => onPageChange(item)}
@@ -78,7 +92,7 @@ export function Pagination({
         <button
           type="button"
           className="pg"
-          disabled={page >= totalPages}
+          disabled={page >= totalPages || isFetching}
           onClick={() => onPageChange(page + 1)}
           aria-label="Next page"
         >
@@ -91,6 +105,7 @@ export function Pagination({
         <select
           className="select !h-[34px] !py-1 !px-2 !w-auto"
           value={currentSize}
+          disabled={isFetching}
           onChange={(e) => onLimitChange(Number(e.target.value))}
           aria-label="Rows per page"
         >

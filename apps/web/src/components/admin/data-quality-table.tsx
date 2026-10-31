@@ -2,11 +2,13 @@
 
 import React from 'react';
 import { fmtCount } from '@/lib/formatters';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 import type { DataQualityItem } from '@finpilot/shared';
 
 interface DataQualityTableProps {
   items: DataQualityItem[];
   isLoading?: boolean;
+  isFetching?: boolean;
 }
 
 const ANOMALY_TITLES: Record<string, string> = {
@@ -22,7 +24,7 @@ const ANOMALY_TITLES: Record<string, string> = {
   GOAL_NAME_TYPE: 'Goals whose name and type disagree',
 };
 
-export function DataQualityTable({ items, isLoading }: DataQualityTableProps) {
+export function DataQualityTable({ items, isLoading = false, isFetching = false }: DataQualityTableProps) {
   return (
     <section className="panel" aria-labelledby="dq-h">
       <div className="panel-head">
@@ -37,13 +39,18 @@ export function DataQualityTable({ items, isLoading }: DataQualityTableProps) {
       </div>
 
       {isLoading ? (
-        <div className="p-5 space-y-3">
+        <div className="p-5 space-y-3" role="status" aria-label="Loading data quality checks">
           <div className="skel" style={{ height: '36px' }} />
           <div className="skel" style={{ height: '36px' }} />
           <div className="skel" style={{ height: '36px' }} />
         </div>
       ) : items.length > 0 ? (
-        <div className="tablewrap">
+        <div
+          className="tablewrap relative"
+          style={{ opacity: isFetching ? 0.7 : 1, transition: 'opacity 0.15s ease' }}
+          aria-busy={isLoading || isFetching}
+        >
+          <TableLoadingBar isFetching={isFetching} message="Verifying ledger data quality..." />
           <table className="tbl">
             <thead>
               <tr>
@@ -92,4 +99,3 @@ export function DataQualityTable({ items, isLoading }: DataQualityTableProps) {
     </section>
   );
 }
-

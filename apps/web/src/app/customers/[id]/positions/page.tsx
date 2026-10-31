@@ -2,7 +2,8 @@
 
 import React, { Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Info } from 'lucide-react';
+import { Info, RefreshCw, Loader2 } from 'lucide-react';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';
 import { ProtectedRoute } from '@/components/auth/protected-route';
@@ -42,6 +43,7 @@ function PositionsContent() {
     isError: isPortError,
     error: portError,
     refetch: refetchPort,
+    isFetching: isPortFetching,
   } = useCustomerPortfolio(id);
 
   const isLoading = isCustLoading || isPortLoading;
@@ -149,7 +151,7 @@ function PositionsContent() {
             </div>
 
             {/* Positions Table Panel */}
-            <div className="panel" id="pos-region">
+            <div className="panel" id="pos-region" aria-busy={isLoading || isPortFetching}>
               {shownPositions.length === 0 ? (
                 <div className="empty">
                   <Info className="w-7 h-7 text-[var(--ink-3)]" />
@@ -170,7 +172,8 @@ function PositionsContent() {
                   )}
                 </div>
               ) : (
-                <div className="tablewrap">
+                <div className="tablewrap relative" style={{ opacity: isPortFetching ? 0.7 : 1, transition: 'opacity 0.15s ease' }}>
+                  <TableLoadingBar isFetching={isPortFetching} message="Updating portfolio positions..." />
                   <table className="tbl">
                     <caption className="sr-only">Positions by account</caption>
                     <thead>

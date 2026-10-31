@@ -10,12 +10,14 @@ interface RecentTransactionsCardProps {
   customerId: string;
   transactions: Transaction[];
   totalTransactions: number;
+  isLoading?: boolean;
 }
 
 export function RecentTransactionsCard({
   customerId,
   transactions,
   totalTransactions,
+  isLoading = false,
 }: RecentTransactionsCardProps) {
   return (
     <section className="panel" aria-labelledby="rt-heading">
@@ -23,12 +25,20 @@ export function RecentTransactionsCard({
         <h2 className="panel-title" id="rt-heading">
           Recent transactions
         </h2>
-        <Link href={`/customers/${customerId}/transactions`} className="text-sm">
-          See all {totalTransactions}
-        </Link>
+        {totalTransactions > 0 && (
+          <Link href={`/customers/${customerId}/transactions`} className="text-sm">
+            See all {totalTransactions}
+          </Link>
+        )}
       </div>
 
-      {transactions.length ? (
+      {isLoading ? (
+        <div className="p-4 space-y-3" role="status" aria-label="Loading recent transactions">
+          <div className="skel" style={{ height: '24px' }} />
+          <div className="skel" style={{ height: '24px' }} />
+          <div className="skel" style={{ height: '24px' }} />
+        </div>
+      ) : transactions.length ? (
         <div className="tablewrap">
           <table className="tbl">
             <thead>
@@ -89,11 +99,10 @@ export function RecentTransactionsCard({
           </table>
         </div>
       ) : (
-        <div className="empty">
-          <p className="text-[var(--ink-2)]">No transactions recorded for this customer.</p>
+        <div className="empty p-6 text-center">
+          <p className="text-[var(--ink-2)] text-sm">No transactions recorded for this customer.</p>
         </div>
       )}
     </section>
   );
 }
-

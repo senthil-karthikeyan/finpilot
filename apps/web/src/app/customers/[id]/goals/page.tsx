@@ -2,7 +2,8 @@
 
 import React, { useState, Suspense } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, Target, AlertCircle, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Target, AlertCircle, Pencil, Trash2, RefreshCw, Loader2 } from 'lucide-react';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 
 import { AppShell } from '@/components/layout/app-shell';
 import { ProtectedRoute } from '@/components/auth/protected-route';
@@ -40,6 +41,7 @@ function GoalsContent() {
     isError: isGoalsError,
     error: goalsError,
     refetch: refetchGoals,
+    isFetching: isGoalsFetching,
   } = useCustomerGoals(id);
 
   // Modal dialog states
@@ -102,7 +104,8 @@ function GoalsContent() {
     <ProtectedRoute>
       <AppShell customerContext={customerContext}>
         {isCustLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-4 relative" style={{ opacity: isGoalsFetching ? 0.7 : 1, transition: 'opacity 0.15s ease' }}>
+                    <TableLoadingBar isFetching={isGoalsFetching && !isGoalsLoading} message="Updating financial goals..." />
             <div className="skel" style={{ height: '40px', width: '320px' }} />
             <div className="skel" style={{ height: '20px', width: '220px' }} />
             <div className="skel" style={{ height: '360px', marginTop: '24px' }} />
@@ -136,7 +139,7 @@ function GoalsContent() {
               </button>
             </div>
 
-            <div id="goal-region">
+            <div id="goal-region" aria-busy={isGoalsLoading || isGoalsFetching}>
               {/* Summary line */}
               {count > 0 && (
                 <div className="summary-line panel panel-body mb-5">

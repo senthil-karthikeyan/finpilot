@@ -41,7 +41,7 @@ function CustomerOverviewContent() {
     refetch: refetchPort,
   } = useCustomerPortfolio(id);
 
-  const { data: goals = [] } = useCustomerGoals(id);
+  const { data: goals = [], isLoading: isGoalsLoading } = useCustomerGoals(id);
   const { data: transactionsData } = useCustomerRecentTransactions(id, 5);
   const { data: cashFlowData } = useCustomerCashFlow(id);
 
@@ -116,7 +116,7 @@ function CustomerOverviewContent() {
               {/* Two Column Grid: Accounts List + Goals Preview */}
               <div className="grid two">
                 <AccountsListCard customerId={id} accounts={portfolio.accounts} />
-                <GoalsPreviewCard customerId={id} goals={goals} />
+                <GoalsPreviewCard customerId={id} goals={goals} isLoading={isGoalsLoading} />
               </div>
 
               {/* Two Column Grid: Net Cash Flow Chart + Recent Transactions */}

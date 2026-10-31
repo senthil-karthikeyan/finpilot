@@ -10,7 +10,7 @@ import { useDataQuality } from '@/hooks/use-admin';
 import { fmtCount, fmtDate } from '@/lib/formatters';
 
 function DataQualityContent() {
-  const { data: dqResponse, isLoading, isError, error, refetch } = useDataQuality();
+  const { data: dqResponse, isLoading, isError, error, refetch, isFetching } = useDataQuality();
 
   const items = dqResponse?.items || [];
   const totalAnomalies = items.reduce((acc, item) => acc + (item.count || 0), 0);
@@ -84,7 +84,7 @@ function DataQualityContent() {
               </button>
             </div>
           ) : (
-            <DataQualityTable items={items} isLoading={isLoading} />
+            <DataQualityTable items={items} isLoading={isLoading} isFetching={isFetching} />
           )}
 
           {/* Architecture & Rules reference */}

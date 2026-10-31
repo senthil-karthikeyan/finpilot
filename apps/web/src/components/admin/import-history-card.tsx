@@ -1,36 +1,64 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Eye } from 'lucide-react';
+import { Eye, RefreshCw } from 'lucide-react';
 import { fmtCount } from '@/lib/formatters';
 import { BatchDetailModal } from './batch-detail-modal';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 import type { ImportBatch } from '@finpilot/shared';
 
 interface ImportHistoryCardProps {
   batches: ImportBatch[];
   isLoading?: boolean;
+  isFetching?: boolean;
+  onRefresh?: () => void;
 }
 
-export function ImportHistoryCard({ batches, isLoading }: ImportHistoryCardProps) {
+export function ImportHistoryCard({
+  batches,
+  isLoading,
+  isFetching = false,
+  onRefresh,
+}: ImportHistoryCardProps) {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
 
   return (
     <>
       <section className="panel" aria-labelledby="hist-h">
-        <div className="panel-head">
+        <div className="panel-head flex items-center justify-between">
           <h2 className="panel-title" id="hist-h">
             Past imports
           </h2>
+          {onRefresh && (
+            <button
+              type="button"
+              className="btn ghost sm inline-flex items-center gap-1.5 text-xs !h-[28px] !px-2.5"
+              onClick={onRefresh}
+              disabled={isFetching}
+              title="Refresh past imports history"
+              aria-label="Refresh past imports history"
+            >
+              <RefreshCw
+                className={`w-3 h-3 ${isFetching ? 'animate-spin text-[var(--indigo)]' : ''}`}
+              />
+              <span>{isFetching ? 'Updating...' : 'Refresh'}</span>
+            </button>
+          )}
         </div>
 
         {isLoading ? (
-          <div className="p-5 space-y-3">
+          <div className="p-5 space-y-3" role="status" aria-label="Loading past imports">
             <div className="skel" style={{ height: '36px' }} />
             <div className="skel" style={{ height: '36px' }} />
             <div className="skel" style={{ height: '36px' }} />
           </div>
         ) : batches.length > 0 ? (
-          <div className="tablewrap">
+          <div
+            className="tablewrap relative"
+            style={{ opacity: isFetching ? 0.7 : 1, transition: 'opacity 0.15s ease' }}
+            aria-busy={isLoading || isFetching}
+          >
+            <TableLoadingBar isFetching={isFetching} message="Updating import history..." />
             <table className="tbl">
               <thead>
                 <tr>

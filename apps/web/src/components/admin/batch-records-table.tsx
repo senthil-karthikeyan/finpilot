@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Download, AlertCircle, FileText } from 'lucide-react';
+import { Download, AlertCircle, FileText, Loader2 } from 'lucide-react';
 import { useRejectedRows } from '@/hooks/use-admin';
 import { Pagination } from '@/components/ui/pagination';
+import { TableLoadingBar } from '@/components/ui/table-loading-bar';
 import { fmtCount } from '@/lib/formatters';
 
 interface BatchRecordsTableProps {
@@ -66,6 +67,7 @@ export function BatchRecordsTable({
             id={`batch-filter-${batchId}`}
             className="select text-xs py-1 px-2.5 !h-[32px] w-auto"
             value={outcome}
+            disabled={isFetching}
             onChange={(e) =>
               handleOutcomeChange(e.target.value as 'all' | 'rejected' | 'duplicate')
             }
@@ -77,8 +79,17 @@ export function BatchRecordsTable({
           </select>
 
           {isFetching && !isLoading && (
-            <span className="text-[11px] text-[var(--ink-3)] animate-pulse" aria-live="polite">
-              Updating...
+            <span
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] text-[var(--indigo)] bg-[var(--indigo-wash)] animate-pulse"
+              role="status"
+              aria-live="polite"
+            >
+              <Loader2 className="w-3 h-3 animate-spin text-[var(--indigo)]" />
+              <span>
+                {outcome === 'all'
+                  ? 'Updating records...'
+                  : `Filtering by ${outcome}...`}
+              </span>
             </span>
           )}
         </div>
@@ -114,7 +125,7 @@ export function BatchRecordsTable({
 
       {/* Loading skeleton state */}
       {isLoading ? (
-        <div className="tablewrap border border-[var(--line)] rounded overflow-hidden">
+        <div className="tablewrap border border-[var(--line)] rounded overflow-hidden" role="status" aria-label="Loading quarantined records">
           <div className="p-4 space-y-2.5">
             <div className="skel" style={{ height: '32px' }} />
             <div className="skel" style={{ height: '36px' }} />
@@ -124,7 +135,12 @@ export function BatchRecordsTable({
         </div>
       ) : rows.length > 0 ? (
         /* Paginated records table */
-        <div className="tablewrap border border-[var(--line)] rounded overflow-hidden">
+        <div
+          className="tablewrap relative border border-[var(--line)] rounded overflow-hidden"
+          style={{ opacity: isFetching ? 0.7 : 1, transition: 'opacity 0.15s ease' }}
+          aria-busy={isLoading || isFetching}
+        >
+          <TableLoadingBar isFetching={isFetching} message="Updating quarantined records..." />
           <table className="tbl text-xs" data-testid="batch-records-table">
             <thead>
               <tr>
@@ -184,6 +200,7 @@ export function BatchRecordsTable({
             total={meta.total}
             pageSize={meta.pageSize}
             pageSizeOptions={[10, 20, 50, 100]}
+            isFetching={isFetching}
             onPageChange={(newPage) => setPage(newPage)}
             onLimitChange={(newLimit) => {
               setPageSize(newLimit);
@@ -195,4 +212,3 @@ export function BatchRecordsTable({
     </div>
   );
 }
-
