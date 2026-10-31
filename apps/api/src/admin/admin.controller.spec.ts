@@ -122,6 +122,22 @@ describe('AdminController', () => {
       expect(res).toEqual(mockResult);
       expect(mockService.getRejectedRows).toHaveBeenCalledWith('IMP-0001', 1, 100);
     });
+
+    it('delegates to service.getRejectedRows with outcome filter', async () => {
+      mockService.getRejectedRows.mockResolvedValue({
+        data: [],
+        meta: { page: 1, pageSize: 20, total: 0, totalPages: 1 },
+      });
+
+      await controller.getRejectedRows('IMP-0001', '1', '20', 'rejected');
+
+      expect(mockService.getRejectedRows).toHaveBeenCalledWith(
+        'IMP-0001',
+        1,
+        20,
+        'rejected',
+      );
+    });
   });
 
   describe('downloadRejectedRowsCsv', () => {

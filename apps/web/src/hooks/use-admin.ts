@@ -5,6 +5,7 @@ import type {
   ImportResponse,
   ImportRowResult,
   DataQualityResponse,
+  PaginatedRejectedRowsResponse,
 } from '@finpilot/shared';
 
 export interface BatchDetailResponse {
@@ -30,6 +31,32 @@ export function useImportBatch(batchId: string) {
   });
 }
 
+export function useRejectedRows(
+  batchId: string,
+  page: number = 1,
+  pageSize: number = 20,
+  outcome?: string,
+) {
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  });
+  if (outcome && outcome !== 'all') {
+    queryParams.set('outcome', outcome);
+  }
+
+  return useQuery<PaginatedRejectedRowsResponse, Error>({
+    queryKey: ['admin-import-rejected-rows', batchId, page, pageSize, outcome || 'all'],
+    queryFn: () =>
+      api.get<PaginatedRejectedRowsResponse>(
+        `/api/v1/admin/imports/${encodeURIComponent(batchId)}/rejected?${queryParams.toString()}`,
+      ),
+    enabled: Boolean(batchId),
+    placeholderData: (previousData) => previousData,
+    staleTime: 30_000,
+  });
+}
+
 export function useDataQuality() {
   return useQuery<DataQualityResponse, Error>({
     queryKey: ['admin-data-quality'],
@@ -51,4 +78,3 @@ export function useUploadTransactionsCsv() {
     },
   });
 }
-

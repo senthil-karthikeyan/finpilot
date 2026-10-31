@@ -402,6 +402,7 @@ export class AdminService {
     batchId: string,
     page: number = 1,
     pageSize: number = 100,
+    outcome?: string,
   ): Promise<PaginatedRejectedRowsResponse> {
     const cleanBatchId = batchId.trim();
     const clampedPage = Math.max(page, 1);
@@ -420,9 +421,14 @@ export class AdminService {
       );
     }
 
+    const outcomeCondition =
+      outcome && (outcome === 'rejected' || outcome === 'duplicate')
+        ? eq(schema.importRows.outcome, outcome)
+        : sql`${schema.importRows.outcome} IN ('rejected', 'duplicate')`;
+
     const whereClause = and(
       eq(schema.importRows.batchId, cleanBatchId),
-      sql`${schema.importRows.outcome} IN ('rejected', 'duplicate')`,
+      outcomeCondition,
     );
 
     const [countResult] = await this.db

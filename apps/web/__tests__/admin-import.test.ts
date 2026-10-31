@@ -151,5 +151,55 @@ describe('Admin import & Data quality logic', () => {
       expect(isZeroClean(mockItems[0]!)).toBe(false);
     });
   });
-});
 
+  describe('Paginated rejected rows & CSV endpoint logic', () => {
+    it('constructs correct paginated endpoint URL with default pagination', () => {
+      const batchId = 'IMP-0001';
+      const page = 1;
+      const pageSize = 20;
+      const queryParams = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      });
+
+      const url = `/api/v1/admin/imports/${encodeURIComponent(batchId)}/rejected?${queryParams.toString()}`;
+      expect(url).toBe('/api/v1/admin/imports/IMP-0001/rejected?page=1&pageSize=20');
+    });
+
+    it('constructs paginated endpoint URL with custom page and outcome filter', () => {
+      const batchId = 'IMP-0002';
+      const page = 2;
+      const pageSize = 50;
+      const outcome: string = 'rejected';
+      const queryParams = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      });
+      if (outcome && outcome !== 'all') {
+        queryParams.set('outcome', outcome);
+      }
+
+      const url = `/api/v1/admin/imports/${encodeURIComponent(batchId)}/rejected?${queryParams.toString()}`;
+      expect(url).toBe('/api/v1/admin/imports/IMP-0002/rejected?page=2&pageSize=50&outcome=rejected');
+    });
+
+    it('constructs direct server-side CSV download URL', () => {
+      const batchId = 'IMP-0001';
+      const csvUrl = `/api/v1/admin/imports/${encodeURIComponent(batchId)}/rejected/csv`;
+      expect(csvUrl).toBe('/api/v1/admin/imports/IMP-0001/rejected/csv');
+    });
+
+    it('correctly calculates pagination metadata for rejected rows response', () => {
+      const total = 55;
+      const pageSize = 20;
+      const totalPages = Math.ceil(total / pageSize);
+      const currentPage = 2;
+      const from = (currentPage - 1) * pageSize + 1;
+      const to = Math.min(total, currentPage * pageSize);
+
+      expect(totalPages).toBe(3);
+      expect(from).toBe(21);
+      expect(to).toBe(40);
+    });
+  });
+});

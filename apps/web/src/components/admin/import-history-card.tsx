@@ -100,6 +100,7 @@ export function ImportHistoryCard({ batches, isLoading }: ImportHistoryCardProps
       {/* Modal to inspect batch rows */}
       <BatchDetailModal
         batchId={selectedBatchId}
+        batch={batches.find((b) => b.batchId === selectedBatchId)}
         open={Boolean(selectedBatchId)}
         onOpenChange={(open) => {
           if (!open) setSelectedBatchId(null);

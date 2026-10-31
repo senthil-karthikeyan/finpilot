@@ -20,6 +20,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiParam,
+  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { type AuthUser } from '@finpilot/shared';
@@ -122,6 +123,12 @@ export class AdminController {
     description: 'Batch identifier (e.g. IMP-0001)',
     example: 'IMP-0001',
   })
+  @ApiQuery({
+    name: 'outcome',
+    required: false,
+    description: 'Filter by outcome (rejected or duplicate)',
+    enum: ['rejected', 'duplicate'],
+  })
   @ApiOkResponse({
     description: 'Paginated rejected rows.',
   })
@@ -132,10 +139,13 @@ export class AdminController {
     @Param('batchId') batchId: string,
     @Query('page') page: string = '1',
     @Query('pageSize') pageSize: string = '100',
+    @Query('outcome') outcome?: string,
   ) {
     const pageNum = parseInt(page, 10) || 1;
     const pageSizeNum = parseInt(pageSize, 10) || 100;
-    return this.adminService.getRejectedRows(batchId, pageNum, pageSizeNum);
+    return outcome
+      ? this.adminService.getRejectedRows(batchId, pageNum, pageSizeNum, outcome)
+      : this.adminService.getRejectedRows(batchId, pageNum, pageSizeNum);
   }
 
   @Get('imports/:batchId/rejected/csv')
