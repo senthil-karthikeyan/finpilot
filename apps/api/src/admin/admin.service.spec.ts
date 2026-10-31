@@ -91,7 +91,7 @@ describe('AdminService', () => {
       const mockBatches = [
         {
           batchId: 'BATCH-INITIAL-SEED',
-          filename: 'transactions.csv',
+          fileName: 'transactions.csv',
           importedBy: 'system/seed',
           receivedAt: new Date('2026-09-18T00:00:00Z'),
           rowCount: 4554,
@@ -122,7 +122,7 @@ describe('AdminService', () => {
     it('returns batch and audit rows when found', async () => {
       const mockBatch = {
         batchId: 'IMP-0001',
-        filename: 'batch1.csv',
+        fileName: 'batch1.csv',
         importedBy: 'admin@finpilot.test',
         receivedAt: new Date('2026-09-18T00:00:00Z'),
         rowCount: 10,

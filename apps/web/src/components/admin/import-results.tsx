@@ -16,12 +16,12 @@ export function ImportResults({ result, onReset }: ImportResultsProps) {
   >('attention');
 
   const batchId = result.batchId;
-  const fileName = result.fileName || result.filename || 'transactions.csv';
-  const totalRows = result.totalRows ?? result.rowCount ?? 0;
-  const imported = result.imported ?? result.importedCount ?? 0;
-  const duplicates = result.duplicate ?? result.duplicateCount ?? 0;
-  const rejected = result.rejected ?? result.rejectedCount ?? 0;
-  const futureDated = result.futureDated ?? result.futureDatedCount ?? 0;
+  const fileName = result.fileName || 'transactions.csv';
+  const totalRows = result.totalRows ?? 0;
+  const imported = result.imported ?? 0;
+  const duplicates = result.duplicate ?? 0;
+  const rejected = result.rejected ?? 0;
+  const futureDated = result.futureDated ?? 0;
   const durationMs = result.durationMs ?? 0;
 
   const rows: ImportRowResult[] = result.rows || [];
@@ -225,4 +225,3 @@ export function ImportResults({ result, onReset }: ImportResultsProps) {
     </section>
   );
 }
-

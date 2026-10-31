@@ -52,9 +52,9 @@ export function ImportHistoryCard({ batches, isLoading }: ImportHistoryCardProps
               </thead>
               <tbody>
                 {batches.map((b) => {
-                  const imported = b.imported ?? b.importedCount ?? 0;
-                  const skipped = b.duplicate ?? b.duplicateCount ?? 0;
-                  const rejected = (b.rejected ?? b.rejectedCount ?? 0) + (b.futureDated ?? 0);
+                  const imported = b.imported;
+                  const skipped = b.duplicate;
+                  const rejected = b.rejected + (b.futureDated ?? 0);
 
                   return (
                     <tr key={b.batchId}>
@@ -62,7 +62,7 @@ export function ImportHistoryCard({ batches, isLoading }: ImportHistoryCardProps
                         <code>{b.batchId}</code>
                       </td>
                       <td className="text-[var(--ink-2)] max-w-[180px] truncate">
-                        {b.fileName || b.filename}
+                        {b.fileName}
                       </td>
                       <td className="num font-semibold text-[var(--gain)]">
                         {fmtCount(imported)}
@@ -108,4 +108,3 @@ export function ImportHistoryCard({ batches, isLoading }: ImportHistoryCardProps
     </>
   );
 }
-

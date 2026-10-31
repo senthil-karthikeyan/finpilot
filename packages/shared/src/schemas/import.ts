@@ -19,17 +19,11 @@ export type ImportRowResult = z.infer<typeof ImportRowResultSchema>;
 export const ImportResponseSchema = z.object({
   batchId: z.string(),
   fileName: z.string(),
-  filename: z.string().optional(),
   totalRows: z.number().int(), // total data rows parsed (excludes header)
-  rowCount: z.number().int().optional(),
   imported: z.number().int(), // rows successfully written to transactions
-  importedCount: z.number().int().optional(),
   futureDated: z.number().int(), // subset of imported: rows with is_future = true
-  futureDatedCount: z.number().int().optional(),
   duplicate: z.number().int(), // rows skipped because transaction_id already exists
-  duplicateCount: z.number().int().optional(),
   rejected: z.number().int(), // rows that failed validation
-  rejectedCount: z.number().int().optional(),
   durationMs: z.number().int().optional(),
   status: z.string().optional(),
   rows: z.array(ImportRowResultSchema), // full per-row breakdown
@@ -41,20 +35,13 @@ export type ImportResponse = z.infer<typeof ImportResponseSchema>;
 export const ImportBatchSchema = z.object({
   batchId: z.string(),
   fileName: z.string(),
-  filename: z.string().optional(),
   importedBy: z.string(), // user email
   importedAt: z.string(), // ISO timestamp
-  receivedAt: z.string().optional(),
   totalRows: z.number().int(),
-  rowCount: z.number().int().optional(),
   imported: z.number().int(),
-  importedCount: z.number().int().optional(),
   futureDated: z.number().int(),
-  futureDatedCount: z.number().int().optional(),
   duplicate: z.number().int(),
-  duplicateCount: z.number().int().optional(),
   rejected: z.number().int(),
-  rejectedCount: z.number().int().optional(),
   durationMs: z.number().int().nullable().optional(),
   status: z.string(),
 });

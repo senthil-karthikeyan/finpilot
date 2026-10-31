@@ -15,7 +15,7 @@ export const importBatches = pgTable(
   'import_batches',
   {
     batchId: text('batch_id').primaryKey(), // IMP-0001, etc.
-    filename: text('filename').notNull(),
+    fileName: text('filename').notNull(),
     importedBy: text('imported_by').notNull(), // user email
     receivedAt: timestamp('received_at', { withTimezone: true })
       .notNull()

@@ -114,7 +114,7 @@ export class AdminService {
 
     await this.db.insert(schema.importBatches).values({
       batchId,
-      filename: file.originalname,
+      fileName: file.originalname,
       importedBy: userEmail,
       status: 'COMPLETED',
       rowCount: parsedRows.length,
@@ -225,17 +225,11 @@ export class AdminService {
     return {
       batchId,
       fileName: file.originalname,
-      filename: file.originalname,
       totalRows: parsedRows.length,
-      rowCount: parsedRows.length,
       imported: importedCount,
-      importedCount,
       futureDated: futureDatedCount,
-      futureDatedCount,
       duplicate: duplicateCount,
-      duplicateCount,
       rejected: rejectedCount,
-      rejectedCount,
       durationMs,
       status: 'COMPLETED',
       rows: rowResults,
@@ -253,21 +247,14 @@ export class AdminService {
 
     return batches.map((b) => ({
       batchId: b.batchId,
-      fileName: b.filename,
-      filename: b.filename,
+      fileName: b.fileName,
       importedBy: b.importedBy,
       importedAt: b.receivedAt.toISOString(),
-      receivedAt: b.receivedAt.toISOString(),
       totalRows: b.rowCount,
-      rowCount: b.rowCount,
       imported: b.importedCount,
-      importedCount: b.importedCount,
       futureDated: b.futureDatedCount,
-      futureDatedCount: b.futureDatedCount,
       duplicate: b.duplicateCount,
-      duplicateCount: b.duplicateCount,
       rejected: b.rejectedCount,
-      rejectedCount: b.rejectedCount,
       durationMs: b.durationMs,
       status: b.status,
     }));
@@ -296,8 +283,7 @@ export class AdminService {
     return {
       batch: {
         batchId: batch.batchId,
-        fileName: batch.filename,
-        filename: batch.filename,
+        fileName: batch.fileName,
         importedBy: batch.importedBy,
         importedAt: batch.receivedAt.toISOString(),
         totalRows: batch.rowCount,

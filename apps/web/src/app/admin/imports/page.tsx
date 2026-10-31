@@ -66,7 +66,7 @@ function AdminImportsContent() {
       setImportResult(res);
       setPhase('done');
       toast.success(
-        `Import complete: ${fmtCount(res.imported ?? res.importedCount ?? 0)} transactions loaded`,
+        `Import complete: ${fmtCount(res.imported)} transactions loaded`,
       );
 
       refetchBatches();
@@ -93,7 +93,7 @@ function AdminImportsContent() {
   };
 
   const totalLedgerTransactions = batches.reduce(
-    (acc, b) => acc + (b.imported ?? b.importedCount ?? 0),
+    (acc, b) => acc + b.imported,
     0,
   );
 

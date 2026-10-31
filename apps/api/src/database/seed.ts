@@ -305,7 +305,7 @@ export async function runSeed() {
       .insert(schema.importBatches)
       .values({
         batchId,
-        filename: 'transactions.csv (initial seed)',
+        fileName: 'transactions.csv (initial seed)',
         importedBy: 'system/seed',
         status: 'COMPLETED',
         rowCount: rawTransactions.length,

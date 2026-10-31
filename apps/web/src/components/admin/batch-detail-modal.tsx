@@ -61,8 +61,8 @@ export function BatchDetailModal({
                   Batch {batchId}
                 </Dialog.Title>
                 <p id="batch-desc" className="text-[var(--ink-2)] text-sm mt-1">
-                  {batch?.fileName || batch?.filename} • Imported by {batch?.importedBy} on{' '}
-                  {fmtDate(batch?.importedAt || batch?.receivedAt)}
+                  {batch?.fileName} • Imported by {batch?.importedBy} on{' '}
+                  {batch?.importedAt ? fmtDate(batch.importedAt) : '-'}
                 </p>
               </div>
               <Dialog.Close asChild>
@@ -94,22 +94,22 @@ export function BatchDetailModal({
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-[var(--surface-sunken)] rounded-md text-sm">
                     <div>
                       <span className="text-[var(--ink-2)] block text-xs">Total</span>
-                      <b>{fmtCount(batch.totalRows ?? batch.rowCount ?? 0)}</b>
+                      <b>{fmtCount(batch.totalRows)}</b>
                     </div>
                     <div>
                       <span className="text-[var(--ink-2)] block text-xs">Imported</span>
                       <b className="text-[var(--gain)]">
-                        {fmtCount(batch.imported ?? batch.importedCount ?? 0)}
+                        {fmtCount(batch.imported)}
                       </b>
                     </div>
                     <div>
                       <span className="text-[var(--ink-2)] block text-xs">Duplicates</span>
-                      <b>{fmtCount(batch.duplicate ?? batch.duplicateCount ?? 0)}</b>
+                      <b>{fmtCount(batch.duplicate)}</b>
                     </div>
                     <div>
                       <span className="text-[var(--ink-2)] block text-xs">Rejected</span>
-                      <b className={(batch.rejected ?? 0) > 0 ? 'text-[var(--loss)]' : ''}>
-                        {fmtCount(batch.rejected ?? batch.rejectedCount ?? 0)}
+                      <b className={batch.rejected > 0 ? 'text-[var(--loss)]' : ''}>
+                        {fmtCount(batch.rejected)}
                       </b>
                     </div>
                   </div>
@@ -189,4 +189,3 @@ export function BatchDetailModal({
     </Dialog.Root>
   );
 }
-
