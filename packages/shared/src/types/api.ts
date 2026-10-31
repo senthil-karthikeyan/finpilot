@@ -9,6 +9,7 @@ import { DEFAULT_LIMIT, DEFAULT_PAGE, MAX_LIMIT } from '../constants/index.js';
  */
 export const PaginationQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(DEFAULT_PAGE),
+  pageSize: z.coerce.number().int().min(1).max(MAX_LIMIT).optional(),
   limit: z.coerce.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
 });
 export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
@@ -16,7 +17,8 @@ export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
 /** Pagination metadata returned on every paginated response. */
 export const PaginationMetaSchema = z.object({
   page: z.number().int(),
-  limit: z.number().int(),
+  pageSize: z.number().int().optional(),
+  limit: z.number().int().optional(),
   total: z.number().int(),
   totalPages: z.number().int(),
 });

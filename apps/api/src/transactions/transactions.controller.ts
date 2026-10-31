@@ -5,10 +5,12 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service.js';
 import { GetTransactionsDto } from './dto/get-transactions.dto.js';
 
+@ApiBearerAuth()
 @ApiTags('Transactions')
 @Controller('customers')
 export class TransactionsController {
@@ -28,6 +30,24 @@ export class TransactionsController {
   @ApiOkResponse({
     description:
       'Paginated transactions list with pagination metadata and data-quality anomaly flags.',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: { type: 'object' },
+        },
+        meta: {
+          type: 'object',
+          properties: {
+            page: { type: 'number', example: 1 },
+            pageSize: { type: 'number', example: 100 },
+            total: { type: 'number', example: 4554 },
+            totalPages: { type: 'number', example: 46 },
+          },
+        },
+      },
+    },
   })
   @ApiNotFoundResponse({
     description: 'Customer with the specified ID was not found.',

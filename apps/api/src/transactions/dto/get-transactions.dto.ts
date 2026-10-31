@@ -117,17 +117,31 @@ export class GetTransactionsDto {
   page: number = 1;
 
   @ApiPropertyOptional({
-    default: 20,
+    default: 100,
     minimum: 1,
     maximum: 100,
-    description: 'Page size (items per page, max 100)',
+    description: 'Page size (default 100, maximum 100)',
+    example: 100,
   })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit: number = 20;
+  pageSize?: number = 100;
+
+  @ApiPropertyOptional({
+    default: 100,
+    minimum: 1,
+    maximum: 100,
+    description: 'Alias for pageSize (items per page, max 100)',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
 
   @ApiPropertyOptional({
     enum: ['tradeDate', 'amount', 'transactionType'],
@@ -147,4 +161,3 @@ export class GetTransactionsDto {
   @IsEnum(['asc', 'desc'])
   sortDir: 'asc' | 'desc' = 'desc';
 }
-

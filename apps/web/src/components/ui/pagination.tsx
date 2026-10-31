@@ -8,7 +8,8 @@ export interface PaginationProps {
   page: number;
   totalPages: number;
   total: number;
-  limit: number;
+  pageSize?: number;
+  limit?: number;
   pageSizeOptions?: number[];
   onPageChange: (newPage: number) => void;
   onLimitChange: (newLimit: number) => void;
@@ -18,13 +19,15 @@ export function Pagination({
   page,
   totalPages,
   total,
+  pageSize,
   limit,
-  pageSizeOptions = [10, 20, 50],
+  pageSizeOptions = [20, 50, 100],
   onPageChange,
   onLimitChange,
 }: PaginationProps) {
-  const from = total ? (page - 1) * limit + 1 : 0;
-  const to = Math.min(total, page * limit);
+  const currentSize = pageSize || limit || 100;
+  const from = total ? (page - 1) * currentSize + 1 : 0;
+  const to = Math.min(total, page * currentSize);
 
   // Generate page numbers with ellipses
   const pageNumbers: (number | 'ellipsis')[] = [];
@@ -38,7 +41,7 @@ export function Pagination({
 
   return (
     <nav className="pager" aria-label="Pagination">
-      <span className="text-[13px] text-[var(--ink-2)]">
+      <span className="text-[13px] text-[var(--ink-2)]" id="pagination-summary">
         Showing {fmtCount(from)}–{fmtCount(to)} of {fmtCount(total)}
       </span>
 
@@ -87,7 +90,7 @@ export function Pagination({
         <span>Rows per page</span>
         <select
           className="select !h-[34px] !py-1 !px-2 !w-auto"
-          value={limit}
+          value={currentSize}
           onChange={(e) => onLimitChange(Number(e.target.value))}
           aria-label="Rows per page"
         >
@@ -101,4 +104,3 @@ export function Pagination({
     </nav>
   );
 }
-

@@ -46,7 +46,8 @@ export const TransactionQuerySchema = z.object({
   dateFrom: z.string().optional(), // alias for startDate
   dateTo: z.string().optional(), // alias for endDate
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(100).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
   sortBy: z.enum(['tradeDate', 'amount', 'transactionType', 'type']).default('tradeDate'),
   sortDir: z.enum(['asc', 'desc']).default('desc'),
 });

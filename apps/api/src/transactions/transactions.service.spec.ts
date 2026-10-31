@@ -102,6 +102,7 @@ describe('TransactionsService', () => {
 
       expect(result.meta).toEqual({
         page: 1,
+        pageSize: 10,
         limit: 10,
         total: 42,
         totalPages: 5,

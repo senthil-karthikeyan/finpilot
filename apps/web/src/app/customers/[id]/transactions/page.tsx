@@ -10,15 +10,7 @@ import { CustomerHeader } from '@/components/customers/customer-header';
 import { Pagination } from '@/components/ui/pagination';
 import { useCustomer } from '@/hooks/use-portfolio';
 import { useCustomerTransactions } from '@/hooks/use-transactions';
-import {
-  inr,
-  fmtDate,
-  fmtQty,
-  fmtCount,
-  sgn,
-  pnlClass,
-  cap,
-} from '@/lib/formatters';
+import { inr, fmtDate, fmtQty, fmtCount, sgn, pnlClass, cap } from '@/lib/formatters';
 import { ACCOUNT_TYPE_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/constants';
 import type { TransactionType, TransactionStatus } from '@finpilot/shared';
 
@@ -36,10 +28,12 @@ function TransactionsContent() {
   const initialStatus = (searchParams.get('status') as TransactionStatus | null) || '';
   const initialStart = searchParams.get('startDate') || searchParams.get('from') || '';
   const initialEnd = searchParams.get('endDate') || searchParams.get('to') || '';
-  const initialSortBy = (searchParams.get('sortBy') as 'tradeDate' | 'amount' | 'transactionType') || 'tradeDate';
+  const initialSortBy =
+    (searchParams.get('sortBy') as 'tradeDate' | 'amount' | 'transactionType') || 'tradeDate';
   const initialSortDir = (searchParams.get('sortDir') as 'asc' | 'desc') || 'desc';
   const initialPage = Number(searchParams.get('page')) || 1;
-  const initialLimit = Number(searchParams.get('limit')) || 20;
+  const initialLimit =
+    Number(searchParams.get('pageSize')) || Number(searchParams.get('limit')) || 100;
 
   const [accountId, setAccountId] = useState<string>(initialAccount);
   const [transactionType, setTransactionType] = useState<TransactionType | ''>(initialType);
@@ -73,6 +67,7 @@ function TransactionsContent() {
     startDate: startDate || undefined,
     endDate: endDate || undefined,
     page,
+    pageSize: limit,
     limit,
     sortBy,
     sortDir,
@@ -111,7 +106,7 @@ function TransactionsContent() {
     if (newSortBy !== 'tradeDate') q.set('sortBy', newSortBy);
     if (newSortDir !== 'desc') q.set('sortDir', newSortDir);
     if (newPage > 1) q.set('page', String(newPage));
-    if (newLimit !== 20) q.set('limit', String(newLimit));
+    if (newLimit !== 100) q.set('pageSize', String(newLimit));
 
     const qs = q.toString();
     const newPath = qs ? `/customers/${id}/transactions?${qs}` : `/customers/${id}/transactions`;
@@ -146,9 +141,7 @@ function TransactionsContent() {
     updateUrl('', '', '', '', '', 'tradeDate', 'desc', 1, limit);
   };
 
-  const hasActiveFilters = Boolean(
-    accountId || transactionType || status || startDate || endDate,
-  );
+  const hasActiveFilters = Boolean(accountId || transactionType || status || startDate || endDate);
 
   return (
     <ProtectedRoute>
@@ -275,8 +268,7 @@ function TransactionsContent() {
                     <option value="">All accounts</option>
                     {customer.accounts.map((a) => (
                       <option key={a.accountId} value={a.accountId}>
-                        {a.accountId},{' '}
-                        {ACCOUNT_TYPE_LABELS[a.accountType] || a.accountType}
+                        {a.accountId}, {ACCOUNT_TYPE_LABELS[a.accountType] || a.accountType}
                       </option>
                     ))}
                   </select>
@@ -344,11 +336,7 @@ function TransactionsContent() {
                 </div>
 
                 {hasActiveFilters && (
-                  <button
-                    className="btn ghost"
-                    type="button"
-                    onClick={resetFilters}
-                  >
+                  <button className="btn ghost" type="button" onClick={resetFilters}>
                     Clear filters
                   </button>
                 )}
@@ -374,11 +362,7 @@ function TransactionsContent() {
                 {isTxLoading && !txResponse ? (
                   <div className="p-5" role="status" aria-label="Loading transactions">
                     {Array.from({ length: 8 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="skel"
-                        style={{ height: '22px', margin: '14px 0' }}
-                      />
+                      <div key={i} className="skel" style={{ height: '22px', margin: '14px 0' }} />
                     ))}
                   </div>
                 ) : !txResponse || txResponse.data.length === 0 ? (
@@ -386,22 +370,16 @@ function TransactionsContent() {
                     <Search className="w-7 h-7 text-[var(--ink-3)]" />
                     <h2 className="h2">No transactions match these filters</h2>
                     <p className="text-[var(--ink-2)]">
-                      Widen the date range or clear a filter to see more of this customer&apos;s activity.
+                      Widen the date range or clear a filter to see more of this customer&apos;s
+                      activity.
                     </p>
-                    <button
-                      type="button"
-                      className="btn ghost"
-                      onClick={resetFilters}
-                    >
+                    <button type="button" className="btn ghost" onClick={resetFilters}>
                       Clear filters
                     </button>
                   </div>
                 ) : (
                   <>
-                    <div
-                      className="tablewrap"
-                      style={{ opacity: isPlaceholderData ? 0.7 : 1 }}
-                    >
+                    <div className="tablewrap" style={{ opacity: isPlaceholderData ? 0.7 : 1 }}>
                       <table className="tbl">
                         <caption className="sr-only">
                           Transactions, page {txResponse.meta.page} of {txResponse.meta.totalPages}
@@ -425,13 +403,12 @@ function TransactionsContent() {
                                 onClick={() => handleSort('tradeDate')}
                               >
                                 <span>Trade date</span>
-                                {sortBy === 'tradeDate' && (
-                                  sortDir === 'asc' ? (
+                                {sortBy === 'tradeDate' &&
+                                  (sortDir === 'asc' ? (
                                     <ArrowUp className="w-3.5 h-3.5" />
                                   ) : (
                                     <ArrowDown className="w-3.5 h-3.5" />
-                                  )
-                                )}
+                                  ))}
                               </button>
                             </th>
                             <th scope="col">Transaction</th>
@@ -462,13 +439,12 @@ function TransactionsContent() {
                                 onClick={() => handleSort('amount')}
                               >
                                 <span>Cash effect</span>
-                                {sortBy === 'amount' && (
-                                  sortDir === 'asc' ? (
+                                {sortBy === 'amount' &&
+                                  (sortDir === 'asc' ? (
                                     <ArrowUp className="w-3.5 h-3.5" />
                                   ) : (
                                     <ArrowDown className="w-3.5 h-3.5" />
-                                  )
-                                )}
+                                  ))}
                               </button>
                             </th>
                             <th scope="col">Status</th>
@@ -488,8 +464,7 @@ function TransactionsContent() {
 
                             const isCashIn = t.type === 'SELL' || t.type === 'DIVIDEND';
                             const cashEffect = isCashIn ? t.amount : -t.amount;
-                            const typeLabel =
-                              TRANSACTION_TYPE_LABELS[t.type] || cap(t.type);
+                            const typeLabel = TRANSACTION_TYPE_LABELS[t.type] || cap(t.type);
 
                             const statusClass =
                               t.status === 'SETTLED'
@@ -499,23 +474,16 @@ function TransactionsContent() {
                                   : 'bad';
 
                             return (
-                              <tr
-                                key={t.id || t.transactionId}
-                                className={rowClass}
-                              >
+                              <tr key={t.id || t.transactionId} className={rowClass}>
                                 <td>{fmtDate(t.tradeDate)}</td>
                                 <td>
                                   <code>{t.id || t.transactionId}</code>
                                 </td>
                                 <td>{t.accountId}</td>
                                 <td>
-                                  <span className="cell-main">
-                                    {t.symbol || '—'}
-                                  </span>
+                                  <span className="cell-main">{t.symbol || '—'}</span>
                                   {t.instrumentName && (
-                                    <span className="cell-sub">
-                                      {t.instrumentName}
-                                    </span>
+                                    <span className="cell-sub">{t.instrumentName}</span>
                                   )}
                                 </td>
                                 <td>
@@ -547,24 +515,14 @@ function TransactionsContent() {
                                     )}
                                   </span>
                                 </td>
-                                <td className="num">
-                                  {t.quantity ? fmtQty(t.quantity) : '—'}
-                                </td>
-                                <td className="num">
-                                  {t.price ? inr(t.price) : '—'}
-                                </td>
-                                <td
-                                  className={`num ${
-                                    isReversed ? '' : pnlClass(cashEffect)
-                                  }`}
-                                >
+                                <td className="num">{t.quantity ? fmtQty(t.quantity) : '—'}</td>
+                                <td className="num">{t.price ? inr(t.price) : '—'}</td>
+                                <td className={`num ${isReversed ? '' : pnlClass(cashEffect)}`}>
                                   {sgn(cashEffect)}
                                   {inr(Math.abs(cashEffect))}
                                 </td>
                                 <td className="status-cell">
-                                  <span className={`badge ${statusClass}`}>
-                                    {cap(t.status)}
-                                  </span>
+                                  <span className={`badge ${statusClass}`}>{cap(t.status)}</span>
                                 </td>
                               </tr>
                             );
@@ -577,7 +535,9 @@ function TransactionsContent() {
                       page={txResponse.meta.page}
                       totalPages={txResponse.meta.totalPages}
                       total={txResponse.meta.total}
-                      limit={txResponse.meta.limit}
+                      pageSize={txResponse.meta.pageSize || txResponse.meta.limit || limit}
+                      limit={txResponse.meta.pageSize || txResponse.meta.limit || limit}
+                      pageSizeOptions={[20, 50, 100]}
                       onPageChange={(p) => {
                         setPage(p);
                         updateUrl(
@@ -625,10 +585,7 @@ export default function CustomerTransactionsPage() {
       fallback={
         <div className="p-8" role="status" aria-label="Loading transactions">
           <div className="skel" style={{ height: '44px', width: '360px' }} />
-          <div
-            className="skel"
-            style={{ height: '18px', width: '240px', marginTop: '14px' }}
-          />
+          <div className="skel" style={{ height: '18px', width: '240px', marginTop: '14px' }} />
           <div className="skel" style={{ height: '340px', marginTop: '34px' }} />
         </div>
       }

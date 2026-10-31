@@ -81,10 +81,11 @@ export class TransactionsService {
       .where(whereClause);
 
     const total = countResult?.total ?? 0;
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
-    const totalPages = Math.ceil(total / limit) || 1;
-    const offset = (page - 1) * limit;
+    const page = Math.max(query.page ?? 1, 1);
+    const rawPageSize = query.pageSize ?? query.limit ?? 100;
+    const pageSize = Math.min(Math.max(rawPageSize, 1), 100);
+    const totalPages = Math.ceil(total / pageSize) || 1;
+    const offset = (page - 1) * pageSize;
 
     // 4. Determine sort direction and expression
     let orderExpr: SQL;
@@ -140,7 +141,7 @@ export class TransactionsService {
       )
       .where(whereClause)
       .orderBy(orderExpr, desc(schema.transactions.transactionId))
-      .limit(limit)
+      .limit(pageSize)
       .offset(offset);
 
     // 6. Map to DTO shape with numeric conversion and flags
@@ -167,7 +168,8 @@ export class TransactionsService {
 
     const meta: PaginationMeta = {
       page,
-      limit,
+      pageSize,
+      limit: pageSize,
       total,
       totalPages,
     };
