@@ -52,11 +52,17 @@ async function bootstrap() {
     .setTitle('FinPilot API')
     .setDescription('Internal investment portfolio and goal monitoring platform')
     .setVersion('1.0')
-    .addCookieAuth('finpilot_token', {
-      type: 'apiKey',
-      in: 'cookie',
-      name: 'finpilot_token',
-    })
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter your JWT token (e.g. Bearer <token>)',
+        in: 'header',
+      },
+      'bearer',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

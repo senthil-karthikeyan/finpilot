@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { AUTH_COOKIE_NAME } from '@finpilot/shared';
+import type { AuthUser } from '@finpilot/shared';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator.js';
 import { JwtPayload } from '../interfaces/jwt-payload.interface.js';
 
@@ -37,7 +37,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
-      (request as Request & { user: any }).user = {
+      (request as Request & { user: AuthUser }).user = {
         id: payload.sub,
         email: payload.email,
         name: payload.name,
@@ -50,12 +50,8 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private extractToken(request: Request): string | undefined {
-    // 1. Primary: Extract from secure httpOnly cookie
-    if (request.cookies?.[AUTH_COOKIE_NAME]) {
-      return request.cookies[AUTH_COOKIE_NAME];
-    }
-
-    // 2. Fallback: Extract from Bearer authorization header (API/Swagger usage)
+    // Authenticate ONLY from "Authorization: Bearer <jwt>".
+    // Never extract from cookies — cookies are managed on the Next.js frontend origin.
     const authHeader = request.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       return authHeader.substring(7);

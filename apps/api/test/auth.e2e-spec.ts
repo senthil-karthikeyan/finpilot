@@ -76,7 +76,7 @@ describe('Authentication (e2e)', () => {
     expect(res.body.message).toBe('Invalid email or password.');
   });
 
-  it('authenticates valid credentials, sets httpOnly cookie, and returns user profile without token in body', async () => {
+  it('authenticates valid credentials and returns access token and user profile in JSON body without setting cookies', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/v1/auth/login')
       .send({
@@ -91,22 +91,17 @@ describe('Authentication (e2e)', () => {
       name: 'Demo Viewer',
       role: 'VIEWER',
     });
-    expect(res.body.token).toBeUndefined();
-
-    const cookies = res.headers['set-cookie'] as unknown as string[];
-    expect(cookies).toBeDefined();
-    expect(cookies.some((c) => c.includes('finpilot_token='))).toBe(true);
-    expect(cookies.some((c) => c.includes('HttpOnly'))).toBe(true);
+    expect(res.body.accessToken).toBe('e2e-mock-jwt-token');
+    expect(res.body.token).toBe('e2e-mock-jwt-token');
+    expect(res.headers['set-cookie']).toBeUndefined();
   });
 
-  it('allows logging out and clears the authentication cookie', async () => {
+  it('allows logging out without setting cookies on API', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/v1/auth/logout')
       .expect(200);
 
     expect(res.body.message).toBe('Logged out successfully.');
-    const cookies = res.headers['set-cookie'] as unknown as string[];
-    expect(cookies).toBeDefined();
-    expect(cookies.some((c) => c.includes('finpilot_token=;'))).toBe(true);
+    expect(res.headers['set-cookie']).toBeUndefined();
   });
 });

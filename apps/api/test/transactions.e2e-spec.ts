@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { vi } from 'vitest';
-import { AUTH_COOKIE_NAME } from '@finpilot/shared';
 import { AppModule } from './../src/app.module.js';
 import { TransactionsService } from '../src/transactions/transactions.service.js';
 
@@ -104,7 +103,7 @@ describe('Transactions (e2e)', () => {
     it('returns 200 with paginated transactions when authenticated', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/customers/C0001/transactions')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(res.body).toHaveProperty('data');
@@ -122,7 +121,7 @@ describe('Transactions (e2e)', () => {
         .get(
           '/api/v1/customers/C0001/transactions?transactionType=BUY&status=SETTLED&page=1&limit=10',
         )
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(res.body.data).toHaveLength(1);
@@ -140,7 +139,7 @@ describe('Transactions (e2e)', () => {
     it('returns 404 when customer is not found', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/customers/C9999/transactions')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(404);
     });
   });

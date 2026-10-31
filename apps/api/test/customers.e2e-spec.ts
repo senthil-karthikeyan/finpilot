@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { vi } from 'vitest';
-import { AUTH_COOKIE_NAME } from '@finpilot/shared';
 import { AppModule } from './../src/app.module.js';
 import { CustomersService } from '../src/customers/customers.service.js';
 
@@ -113,10 +112,10 @@ describe('Customers (e2e)', () => {
       .expect(401);
   });
 
-  it('returns paginated customer list when authenticated with valid cookie', async () => {
+  it('returns paginated customer list when authenticated with valid Bearer token', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/customers?page=1&limit=20&segment=Affluent')
-      .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
     expect(res.body.data).toBeDefined();
@@ -133,7 +132,7 @@ describe('Customers (e2e)', () => {
   it('returns customer details by ID when authenticated', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/customers/C0001')
-      .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
     expect(res.body.id).toBe('C0001');
@@ -146,7 +145,7 @@ describe('Customers (e2e)', () => {
   it('returns 404 when customer ID does not exist', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/customers/C9999')
-      .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(404);
   });
 });

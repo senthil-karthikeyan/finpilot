@@ -14,10 +14,12 @@ import {
   ApiNotFoundResponse,
   ApiUnprocessableEntityResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { GoalsService } from './goals.service.js';
 import { UpdateGoalDto } from './dto/update-goal.dto.js';
 
+@ApiBearerAuth()
 @ApiTags('Goals')
 @Controller('goals')
 export class GoalsController {

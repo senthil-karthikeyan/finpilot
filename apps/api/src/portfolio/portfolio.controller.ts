@@ -5,9 +5,11 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { PortfolioService } from './portfolio.service.js';
 
+@ApiBearerAuth()
 @ApiTags('Portfolio')
 @Controller('customers')
 export class PortfolioController {

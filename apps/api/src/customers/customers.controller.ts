@@ -5,10 +5,12 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CustomersService } from './customers.service.js';
 import { GetCustomersDto } from './dto/get-customers.dto.js';
 
+@ApiBearerAuth()
 @ApiTags('Customers')
 @Controller('customers')
 export class CustomersController {

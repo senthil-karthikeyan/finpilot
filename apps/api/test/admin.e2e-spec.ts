@@ -128,10 +128,17 @@ describe('Admin (e2e)', () => {
         .expect(401);
     });
 
-    it('returns 403 Forbidden when authenticated as VIEWER', async () => {
+    it('returns 401 when cookie is provided without Bearer header (cookies ignored)', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/admin/imports/transactions')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${viewerToken}`])
+        .set('Cookie', [`${AUTH_COOKIE_NAME}=${adminToken}`])
+        .expect(401);
+    });
+
+    it('returns 403 Forbidden when authenticated as VIEWER with Bearer token', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/admin/imports/transactions')
+        .set('Authorization', `Bearer ${viewerToken}`)
         .expect(403);
     });
 
@@ -141,7 +148,7 @@ describe('Admin (e2e)', () => {
 
       const res = await request(app.getHttpServer())
         .post('/api/v1/admin/imports/transactions')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${adminToken}`])
+        .set('Authorization', `Bearer ${adminToken}`)
         .attach('file', Buffer.from(csvContent), 'test_txs.csv')
         .expect(201);
 
@@ -155,14 +162,14 @@ describe('Admin (e2e)', () => {
     it('returns 403 Forbidden when accessed by VIEWER', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/admin/imports')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${viewerToken}`])
+        .set('Authorization', `Bearer ${viewerToken}`)
         .expect(403);
     });
 
     it('returns 200 with import batch list when accessed by ADMIN', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/admin/imports')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${adminToken}`])
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
@@ -175,14 +182,14 @@ describe('Admin (e2e)', () => {
     it('returns 403 when accessed by VIEWER', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/admin/imports/IMP-0001')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${viewerToken}`])
+        .set('Authorization', `Bearer ${viewerToken}`)
         .expect(403);
     });
 
     it('returns 200 with batch detail when accessed by ADMIN', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/admin/imports/IMP-0001')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${adminToken}`])
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
       expect(res.body).toHaveProperty('batch');
@@ -192,7 +199,7 @@ describe('Admin (e2e)', () => {
     it('returns 404 when batch does not exist', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/admin/imports/NONEXISTENT')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${adminToken}`])
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(404);
     });
   });
@@ -201,14 +208,14 @@ describe('Admin (e2e)', () => {
     it('returns 403 when accessed by VIEWER', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/admin/data-quality')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${viewerToken}`])
+        .set('Authorization', `Bearer ${viewerToken}`)
         .expect(403);
     });
 
     it('returns 200 with anomaly summary when accessed by ADMIN', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/admin/data-quality')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${adminToken}`])
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
       expect(res.body).toHaveProperty('items');

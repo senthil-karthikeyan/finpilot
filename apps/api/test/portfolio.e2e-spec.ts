@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { vi } from 'vitest';
-import { AUTH_COOKIE_NAME } from '@finpilot/shared';
 import { AppModule } from './../src/app.module.js';
 import { PortfolioService } from '../src/portfolio/portfolio.service.js';
 
@@ -148,7 +147,7 @@ describe('Portfolio (e2e)', () => {
   it('returns consolidated customer portfolio dashboard when authenticated', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/customers/C0001/portfolio')
-      .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
     expect(res.body.customerId).toBe('C0001');
@@ -165,7 +164,7 @@ describe('Portfolio (e2e)', () => {
   it('returns monthly cash flows when authenticated', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/customers/C0001/cashflow')
-      .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
     expect(res.body.customerId).toBe('C0001');
@@ -177,7 +176,7 @@ describe('Portfolio (e2e)', () => {
   it('returns 404 when customer ID does not exist', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/customers/C9999/portfolio')
-      .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(404);
   });
 });

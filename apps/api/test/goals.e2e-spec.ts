@@ -10,7 +10,6 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { vi } from 'vitest';
-import { AUTH_COOKIE_NAME } from '@finpilot/shared';
 import { AppModule } from './../src/app.module.js';
 import { GoalsService } from '../src/goals/goals.service.js';
 
@@ -131,7 +130,7 @@ describe('Goals (e2e)', () => {
     it('returns 200 with customer goals when authenticated', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/customers/C0001/goals')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
@@ -143,7 +142,7 @@ describe('Goals (e2e)', () => {
     it('returns 404 when customer does not exist', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/customers/C9999/goals')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(404);
     });
   });
@@ -165,7 +164,7 @@ describe('Goals (e2e)', () => {
     it('creates a goal and returns 201 when authenticated', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/customers/C0001/goals')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           name: 'House Downpayment',
           type: 'HOME_PURCHASE',
@@ -182,7 +181,7 @@ describe('Goals (e2e)', () => {
     it('returns 422 when target date is in the past', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/customers/C0001/goals')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           name: 'House Downpayment',
           type: 'HOME_PURCHASE',
@@ -198,7 +197,7 @@ describe('Goals (e2e)', () => {
     it('updates a goal and returns 200 when authenticated', async () => {
       const res = await request(app.getHttpServer())
         .patch('/api/v1/goals/G00001')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           name: 'Updated Retirement Goal',
         })
@@ -210,7 +209,7 @@ describe('Goals (e2e)', () => {
     it('returns 422 when modifying target date to a past date', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/goals/G00001')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           targetDate: '2019-01-01',
         })
@@ -220,7 +219,7 @@ describe('Goals (e2e)', () => {
     it('returns 404 when goal does not exist', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/goals/G99999')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           name: 'Will fail',
         })
@@ -232,7 +231,7 @@ describe('Goals (e2e)', () => {
     it('deletes goal and returns 200 when authenticated', async () => {
       const res = await request(app.getHttpServer())
         .delete('/api/v1/goals/G00001')
-        .set('Cookie', [`${AUTH_COOKIE_NAME}=${authToken}`])
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(res.body).toEqual({ success: true, goalId: 'G00001' });
