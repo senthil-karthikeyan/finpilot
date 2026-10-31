@@ -5,12 +5,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type { AuthUser } from '@finpilot/shared';
 import { api, ApiError } from '@/lib/api-client';
+import { getSafeRedirectUrl } from '@/lib/auth-error-handler';
 
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, nextPath?: string) => Promise<void>;
   logout: () => Promise<void>;
   refetchUser: () => Promise<void>;
 }
@@ -42,19 +43,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
     },
+    meta: {
+      skipAuthRedirect: true, // Don't trigger session-expired toast on initial auth-me check
+    },
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string, nextPath?: string) => {
       const res = await api.post<{ user?: AuthUser } | AuthUser>('/api/v1/auth/login', {
         email,
         password,
       });
-      const authUser = ('user' in res && res.user) ? res.user : (res as AuthUser);
+      const authUser = 'user' in res && res.user ? res.user : (res as AuthUser);
+      // Clear query cache on login
+      queryClient.clear();
       queryClient.setQueryData(['auth-me'], authUser);
-      router.push('/customers');
+
+      const target = getSafeRedirectUrl(nextPath, '/customers');
+      router.replace(target);
     },
     [queryClient, router],
   );
@@ -67,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       queryClient.setQueryData(['auth-me'], null);
       queryClient.clear();
-      router.push('/login');
+      router.replace('/login');
     }
   }, [queryClient, router]);
 
@@ -97,4 +105,3 @@ export function useAuth() {
   }
   return context;
 }
-

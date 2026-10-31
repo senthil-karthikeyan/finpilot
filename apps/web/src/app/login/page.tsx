@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { BrandLogo } from '@/components/brand/brand-logo';
 import { useAuth } from '@/hooks/use-auth';
+import { resetRedirectingFlag, getSafeRedirectUrl } from '@/lib/auth-error-handler';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -17,12 +19,20 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already logged in, redirect to customers
+  // Reset module-level isRedirecting flag when the login page mounts
+  useEffect(() => {
+    resetRedirectingFlag();
+  }, []);
+
+  const nextParam = searchParams.get('next');
+  const safeTarget = getSafeRedirectUrl(nextParam, '/customers');
+
+  // If already logged in, redirect to next path (or /customers)
   useEffect(() => {
     if (!isAuthLoading && isAuthenticated && user) {
-      router.replace('/customers');
+      router.replace(safeTarget);
     }
-  }, [isAuthLoading, isAuthenticated, user, router]);
+  }, [isAuthLoading, isAuthenticated, user, safeTarget, router]);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -40,7 +50,7 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     try {
-      await login(email.trim(), password);
+      await login(email.trim(), password, safeTarget);
       toast.success('Signed in successfully');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Something went wrong';
@@ -208,11 +218,25 @@ export default function LoginPage() {
 
             <p className="hint" style={{ marginTop: '10px' }}>
               Viewers can browse and edit goals. Admins can also import data. Authentication uses a
-              secure httpOnly cookie session.
+              secure httpOnly cookie session on the frontend origin.
             </p>
           </div>
         </div>
       </section>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--indigo)]" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

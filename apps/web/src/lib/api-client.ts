@@ -2,6 +2,7 @@ export class ApiError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    public readonly code?: string,
     public readonly details?: { field: string; message: string }[],
     public readonly correlationId?: string,
   ) {
@@ -33,11 +34,17 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   if (!response.ok) {
     let errorMessage = `HTTP error ${response.status}: ${response.statusText}`;
+    let code: string | undefined;
     let details: { field: string; message: string }[] | undefined;
     let correlationId: string | undefined = response.headers.get('x-correlation-id') ?? undefined;
 
     try {
       const errorData = await response.json();
+      if (errorData.code) {
+        code = String(errorData.code);
+      } else if (errorData.error) {
+        code = String(errorData.error);
+      }
       if (errorData.message) {
         if (Array.isArray(errorData.message)) {
           errorMessage = errorData.message.join(', ');
@@ -56,7 +63,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       // response wasn't JSON
     }
 
-    throw new ApiError(response.status, errorMessage, details, correlationId);
+    throw new ApiError(response.status, errorMessage, code, details, correlationId);
   }
 
   // Handle 204 No Content
