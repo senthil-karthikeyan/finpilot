@@ -16,14 +16,14 @@ export type TransactionType = (typeof TRANSACTION_TYPES)[number];
 export const TRANSACTION_STATUSES = ['SETTLED', 'PENDING', 'REVERSED'] as const;
 export type TransactionStatus = (typeof TRANSACTION_STATUSES)[number];
 
-/** Goal types. */
+/** Goal types matching database schema check constraint and seed data. */
 export const GOAL_TYPES = [
-  'RETIREMENT',
+  'EMERGENCY_FUND',
   'EDUCATION',
-  'HOUSE',
-  'EMERGENCY',
-  'WEALTH',
-  'OTHER',
+  'RETIREMENT',
+  'TRAVEL',
+  'WEALTH_CREATION',
+  'HOME_PURCHASE',
 ] as const;
 export type GoalType = (typeof GOAL_TYPES)[number];
 
