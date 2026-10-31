@@ -1,161 +1,492 @@
-/*
- * Tailwind CSS v4 — CSS-first configuration.
- *
- * In v4, @import "tailwindcss" replaces the old three-directive block
- * (@tailwind base/components/utilities). All theme tokens are declared
- * inside @theme blocks here instead of in tailwind.config.ts/js.
- *
- * shadcn/ui uses CSS custom properties (HSL triplets) for every colour.
- * The @theme block maps those CSS variables into Tailwind utilities so
- * className="bg-background text-foreground" etc. continue to work exactly
- * as they do with the v3 setup.
- */
 @import "tailwindcss";
 
-/* ── Base CSS variables (light mode) ──────────────────────────────────────── */
-
+/* ── FinPilot Design System Tokens (matching docs/finpilot-mock.html) ─────── */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
+  --paper: #e9ece6;      /* lichen-grey page */
+  --surface: #f6f7f3;    /* panels, cards */
+  --sunk: #dfe3dc;       /* wells, zebra */
+  --line: #c9cfc5;       /* border lines */
+  --line-soft: #d8ddd3;  /* dividers */
+  --ink: #16222b;        /* primary text */
+  --ink-2: #4a5963;      /* secondary text */
+  --ink-3: #6c7a83;      /* tertiary / muted */
+  --indigo: #24337a;     /* links, brand primary */
+  --indigo-deep: #1a2561;/* rail sidebar background */
+  --indigo-wash: #dde2f2;/* light indigo badge/hover */
+  --marigold: #e3a008;   /* focus, active tick, highlight */
+  --gain: #1d7a4f;       /* profit / positive flow */
+  --gain-bg: #d3e9dc;    /* profit badge bg */
+  --loss: #b4382c;       /* loss / negative flow */
+  --loss-bg: #f3d6d1;    /* loss badge bg */
+  --warn-ink: #6b4a00;   /* warning text */
+  --warn-bg: #f6e7b8;    /* warning banner bg */
+  --rail-w: 244px;
 
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  /* shadcn compat variables */
+  --background: 84 10% 92%;
+  --foreground: 206 32% 13%;
+  --card: 75 14% 96%;
+  --card-foreground: 206 32% 13%;
+  --border: 96 8% 80%;
+  --primary: 229 54% 31%;
+  --primary-foreground: 220 50% 98%;
+  --muted: 86 10% 87%;
+  --muted-foreground: 204 15% 34%;
+  --accent: 229 45% 91%;
+  --accent-foreground: 230 58% 24%;
+  --radius: 0.375rem;
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
-
-  --radius: 0.5rem;
-
-  /* Chart palette — 6 slots matching the 6 asset classes */
-  --chart-1: 221.2 83.2% 53.3%;   /* blue   — EQUITY      */
-  --chart-2: 142.1 76.2% 36.3%;   /* green  — ETF         */
-  --chart-3: 346.8 77.2% 49.8%;   /* red    — MUTUAL_FUND */
-  --chart-4: 43.3 96.4% 56.3%;    /* amber  — BOND        */
-  --chart-5: 262.1 83.3% 57.8%;   /* purple — REIT        */
-  --chart-6: 24.6 95.0% 53.1%;    /* orange — GSEC        */
+  /* Chart palette (6 asset classes) */
+  --chart-equity: #7f93e6;
+  --chart-etf: #5b86c4;
+  --chart-mf: #4fb3a5;
+  --chart-bond: #b79ad0;
+  --chart-reit: #e3a008;
+  --chart-gsec: #e87b6b;
 }
 
-/* ── Dark mode overrides ───────────────────────────────────────────────────── */
-
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-
-  --primary: 217.2 91.2% 59.8%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 224.3 76.3% 48%;
-
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
-  --chart-6: 40 90% 55%;
-}
-
-/* ── Tailwind v4 theme — maps CSS variables to utility classes ─────────────── */
-/*
- * @theme inline means "extend Tailwind's generated utilities using these values
- * and keep them as var() references" so the colours respond to the :root
- * and .dark overrides above at runtime without re-processing the CSS.
- */
 @theme inline {
-  /* Semantic colour utilities used by shadcn components */
-  --color-background:         hsl(var(--background));
-  --color-foreground:         hsl(var(--foreground));
+  --font-display: var(--font-display), 'Instrument Serif', Georgia, serif;
+  --font-ui: var(--font-ui), 'Public Sans', system-ui, sans-serif;
+  --font-sans: var(--font-ui), 'Public Sans', system-ui, sans-serif;
 
-  --color-card:               hsl(var(--card));
-  --color-card-foreground:    hsl(var(--card-foreground));
-
-  --color-popover:            hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-
-  --color-primary:            hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-
-  --color-secondary:          hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-
-  --color-muted:              hsl(var(--muted));
-  --color-muted-foreground:   hsl(var(--muted-foreground));
-
-  --color-accent:             hsl(var(--accent));
-  --color-accent-foreground:  hsl(var(--accent-foreground));
-
-  --color-destructive:        hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-
-  --color-border:             hsl(var(--border));
-  --color-input:              hsl(var(--input));
-  --color-ring:               hsl(var(--ring));
-
-  /* Chart colour utilities — used by Recharts inside shadcn ChartContainer */
-  --color-chart-1:            hsl(var(--chart-1));
-  --color-chart-2:            hsl(var(--chart-2));
-  --color-chart-3:            hsl(var(--chart-3));
-  --color-chart-4:            hsl(var(--chart-4));
-  --color-chart-5:            hsl(var(--chart-5));
-  --color-chart-6:            hsl(var(--chart-6));
-
-  /* Border-radius scale */
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  /* Typography */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-indigo: var(--indigo);
+  --color-indigo-deep: var(--indigo-deep);
+  --color-indigo-wash: var(--indigo-wash);
+  --color-marigold: var(--marigold);
+  --color-gain: var(--gain);
+  --color-loss: var(--loss);
 }
 
-/* ── Base layer resets (mirrors shadcn's @layer base) ─────────────────────── */
-@layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
+/* ── Typography & Base Elements ───────────────────────────────────────────── */
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14.5px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
 
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--indigo); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--indigo-deep); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--marigold); outline-offset: 2px; border-radius: 3px; }
+
+.font-display { font-family: var(--font-display); }
+.font-ui { font-family: var(--font-ui); }
+
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.up { color: var(--gain); }
+.down { color: var(--loss); }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+
+/* ── Headings ─────────────────────────────────────────────────────────────── */
+.h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 4.2vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.2px;
+}
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 1.15;
+}
+.sub {
+  color: var(--ink-2);
+  margin-top: 6px;
+  max-width: 64ch;
+}
+.lbl {
+  font-weight: 600;
+  font-size: 13px;
+}
+.hint {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+/* ── Shell & Rail ─────────────────────────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+.rail {
+  background: var(--indigo-deep);
+  color: #dfe4f7;
+  padding: 22px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 22px;
+  color: #fff;
+  text-decoration: none;
+}
+.brand-mark { width: 22px; height: 22px; }
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  color: #fff;
+}
+.nav-group {
+  margin-top: 10px;
+  padding: 0 10px 4px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #98a3d6;
+}
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 5px;
+  color: #dfe4f7;
+  text-decoration: none;
+  font-weight: 500;
+  border: 0;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.nav-item[aria-current="page"],
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.nav-item[aria-current="page"]::before,
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  border-radius: 0 3px 3px 0;
+  background: var(--marigold);
+}
+.nav-item.nav-sub {
+  padding-left: 28px;
+  font-size: 13.5px;
+  font-weight: 400;
+}
+.nav-ctx {
+  margin: 8px 0 4px;
+  padding: 10px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.nav-ctx strong { display: block; color: #fff; font-weight: 600; font-size: 14px; }
+.nav-ctx span { font-size: 12.5px; color: #aab3e0; }
+
+.rail-foot {
+  margin-top: auto;
+  padding: 14px 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+}
+.rail-foot .who {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.rail-foot .who b { color: #fff; font-weight: 600; }
+.health {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #aab3e0;
+  font-size: 12.5px;
+  margin-top: 10px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7a86b8;
+  flex: none;
+}
+.dot.ok { background: #5fd196; }
+.dot.bad { background: #ff8b7d; }
+
+.signout {
+  color: #cfd6f3;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 3px 9px;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+.signout:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+.main {
+  padding: 34px clamp(18px, 3.2vw, 48px) 120px;
+  min-width: 0;
+  max-width: 1480px;
+  width: 100%;
+}
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+  margin-bottom: 22px;
+}
+
+/* ── Panels, Rows, Tables ─────────────────────────────────────────────────── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px 0;
+}
+.panel-body { padding: 16px 20px 20px; }
+.panel-title { font: 600 15px/1.3 var(--font-ui); color: var(--ink); }
+
+.tablewrap { overflow-x: auto; width: 100%; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl caption { text-align: left; }
+.tbl th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  white-space: nowrap;
+}
+.tbl th.num { text-align: right; }
+.tbl td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: middle;
+}
+.tbl tbody tr:hover td { background: #eff1ea; }
+.tbl tbody tr.clickable { cursor: pointer; }
+
+/* Anomaly Table Highlighting from Mock */
+.tx-reversed td:not(.status-cell) {
+  color: var(--ink-3);
+  text-decoration: line-through;
+  text-decoration-color: rgba(108, 122, 131, 0.7);
+}
+.tx-reversed td {
+  background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(0, 0, 0, 0.025) 8px 16px);
+}
+.tx-pending td:first-child {
+  box-shadow: inset 4px 0 0 var(--marigold);
+}
+.tx-pending td {
+  background: #f9f2d8;
+}
+.tx-future td {
+  background: #fdf6e2;
+}
+
+/* ── Buttons, Controls, Badges ────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 5px;
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--indigo);
+  background: var(--indigo);
+  color: #fff;
+  text-decoration: none;
+  line-height: 1.2;
+  transition: all 0.15s ease;
+}
+.btn:hover { background: var(--indigo-deep); color: #fff; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn.ghost {
+  background: transparent;
+  color: var(--indigo-deep);
+  border-color: var(--line);
+}
+.btn.ghost:hover {
+  background: var(--indigo-wash);
+  border-color: var(--indigo);
+  color: var(--indigo-deep);
+}
+.btn.sm { padding: 5px 11px; font-size: 13px; }
+
+.input, .select {
+  width: 100%;
+  height: 40px;
+  padding: 6px 11px;
+  border: 1px solid #aeb6aa;
+  border-radius: 5px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+.input:hover, .select:hover { border-color: #8d978a; }
+.input:focus, .select:focus {
+  border-color: var(--indigo);
+  outline: 2px solid var(--marigold);
+  outline-offset: 1px;
+}
+.input[aria-invalid="true"] { border-color: var(--loss); background: #fff8f7; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--sunk);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.badge.ok, .badge.gain { background: var(--gain-bg); color: #0f5a37; }
+.badge.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.badge.bad, .badge.loss { background: var(--loss-bg); color: #8a241b; }
+.badge.indigo { background: var(--indigo-wash); color: var(--indigo-deep); }
+.badge.outline { background: transparent; border: 1px solid var(--line); }
+
+.banner {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 14px;
+  border-radius: 5px;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  border: 1px solid #e2cd86;
+}
+.banner.info { background: var(--indigo-wash); color: var(--indigo-deep); border-color: #bcc5e6; }
+.banner.bad { background: var(--loss-bg); color: #7d2118; border-color: #e3aaa3; }
+
+/* ── Login screen specific styles ─────────────────────────────────────────── */
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  min-height: 100vh;
+}
+.login-art {
+  background: var(--indigo-deep);
+  color: #e8ecfb;
+  padding: clamp(28px, 5vw, 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.login-art h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 1.05;
+  color: #fff;
+  max-width: 14ch;
+}
+.login-art p {
+  max-width: 42ch;
+  color: #b8c1ea;
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.login-art .strip {
+  height: 14px;
+  display: flex;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.login-art small { color: #94a0d6; font-size: 12.5px; }
+
+.login-form {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  padding: 40px 22px;
+}
+.login-form .inner {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 22px;
+}
+.demo {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.demo > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 11px 14px;
+}
+.demo > div + div {
+  border-top: 1px solid var(--line-soft);
+}
+.demo .em { font-weight: 600; color: var(--ink); }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .rail { display: none; }
+  .login { grid-template-columns: 1fr; }
+  .login-art { min-height: 280px; padding: 32px 20px; }
 }
