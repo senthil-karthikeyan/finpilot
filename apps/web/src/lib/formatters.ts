@@ -14,6 +14,24 @@ const nf3 = new Intl.NumberFormat('en-IN', {
 });
 
 /**
+ * Reference date matching the synthetic FinPilot dataset from mock.
+ */
+export const SYSTEM_TODAY = '2026-10-31';
+
+/**
+ * Calculates calendar days difference from the system reference date (pure and deterministic).
+ */
+export function daysFromToday(iso: string | null | undefined): number {
+  if (!iso) return 0;
+  const parts = iso.split('T')[0]?.split('-').map(Number);
+  const todayParts = SYSTEM_TODAY.split('-').map(Number);
+  if (!parts || parts.length < 3 || !todayParts || todayParts.length < 3) return 0;
+  const tIso = Date.UTC(parts[0] ?? 0, (parts[1] ?? 1) - 1, parts[2] ?? 1);
+  const tToday = Date.UTC(todayParts[0] ?? 0, (todayParts[1] ?? 1) - 1, todayParts[2] ?? 1);
+  return Math.round((tIso - tToday) / 864e5);
+}
+
+/**
  * Formats a number in Indian Rupee format with 2 decimal places.
  * Example: 142500 -> "₹1,42,500.00"
  */
@@ -128,4 +146,3 @@ export function sgn(n: number): string {
 export function pnlClass(n: number): string {
   return n > 0.005 ? 'up' : n < -0.005 ? 'down' : '';
 }
-
