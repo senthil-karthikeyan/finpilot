@@ -5,15 +5,21 @@ import { ASSET_CLASSES, ACCOUNT_STATUSES } from '../constants/index.js';
 
 export const PortfolioPositionSchema = z.object({
   instrumentId: z.string(),
+  symbol: z.string(),
   instrumentName: z.string(),
   assetClass: z.enum(ASSET_CLASSES),
+  sector: z.string().nullable(),
+  riskBand: z.string(),
   quantity: z.number(),
-  avgCostPrice: z.number(),   // INR, from transactions
-  currentPrice: z.number(),   // INR, latest price in instruments table
-  marketValue: z.number(),    // quantity × currentPrice, computed in SQL
-  unrealisedPnl: z.number(),  // marketValue − (quantity × avgCostPrice)
-  weightPct: z.number(),      // position as % of total account market value
-  priceDate: z.string(),      // ISO date of the price used (from snapshot)
+  avgCostPrice: z.number(), // INR, acquisition cost
+  currentPrice: z.number(), // INR, latest synthetic price
+  marketValue: z.number(), // quantity × currentPrice
+  costBasis: z.number(), // quantity × avgCostPrice
+  unrealisedPnl: z.number(), // marketValue − costBasis
+  unrealisedPnlPct: z.number().nullable(), // % unrealised gain/loss
+  weightPct: z.number(), // position % of customer total portfolio AUM
+  priceDate: z.string(), // ISO date of latest price
+  snapshotDate: z.string(), // ISO date of holdings snapshot
 });
 export type PortfolioPosition = z.infer<typeof PortfolioPositionSchema>;
 
@@ -22,11 +28,14 @@ export type PortfolioPosition = z.infer<typeof PortfolioPositionSchema>;
 export const AccountPortfolioSchema = z.object({
   accountId: z.string(),
   accountType: z.string(),
+  provider: z.string(),
   status: z.enum(ACCOUNT_STATUSES),
-  openedAt: z.string(),       // ISO date
-  closedAt: z.string().nullable(),
+  openedAt: z.string(), // ISO date
+  baseCurrency: z.string(),
   totalMarketValue: z.number(),
+  totalCostBasis: z.number(),
   totalUnrealisedPnl: z.number(),
+  totalUnrealisedPnlPct: z.number().nullable(),
   positions: z.array(PortfolioPositionSchema),
 });
 export type AccountPortfolio = z.infer<typeof AccountPortfolioSchema>;
@@ -37,28 +46,17 @@ export const AllocationBucketSchema = z.object({
   assetClass: z.enum(ASSET_CLASSES),
   marketValue: z.number(),
   weightPct: z.number(),
+  positionCount: z.number().int(),
 });
 export type AllocationBucket = z.infer<typeof AllocationBucketSchema>;
 
-// ── Full portfolio response (GET /customers/:id/portfolio) ───────────────────
-
-export const PortfolioResponseSchema = z.object({
-  customerId: z.string(),
-  totalAum: z.number(),
-  totalUnrealisedPnl: z.number(),
-  snapshotDate: z.string().nullable(), // date of the holdings snapshot used
-  accounts: z.array(AccountPortfolioSchema),
-  allocation: z.array(AllocationBucketSchema),
-});
-export type PortfolioResponse = z.infer<typeof PortfolioResponseSchema>;
-
-// ── Monthly cash-flow data point (GET /customers/:id/cashflow) ───────────────
+// ── Monthly cash-flow data point ─────────────────────────────────────────────
 
 export const CashFlowMonthSchema = z.object({
-  month: z.string(),      // "YYYY-MM" label for the X-axis
-  buyAmount: z.number(),  // total BUY value (positive)
-  sellAmount: z.number(), // total SELL value (positive)
-  netFlow: z.number(),    // sellAmount − buyAmount (positive = net inflow)
+  month: z.string(), // "YYYY-MM"
+  buyAmount: z.number(), // total settled BUY amount (positive)
+  sellAmount: z.number(), // total settled SELL amount (positive)
+  netFlow: z.number(), // sellAmount − buyAmount
 });
 export type CashFlowMonth = z.infer<typeof CashFlowMonthSchema>;
 
@@ -68,3 +66,18 @@ export const CashFlowResponseSchema = z.object({
 });
 export type CashFlowResponse = z.infer<typeof CashFlowResponseSchema>;
 
+// ── Full portfolio response (GET /customers/:id/portfolio) ───────────────────
+
+export const PortfolioResponseSchema = z.object({
+  customerId: z.string(),
+  totalAum: z.number(),
+  totalCostBasis: z.number(),
+  totalUnrealisedPnl: z.number(),
+  totalUnrealisedPnlPct: z.number().nullable(),
+  snapshotDate: z.string().nullable(),
+  priceDate: z.string().nullable(),
+  accounts: z.array(AccountPortfolioSchema),
+  allocation: z.array(AllocationBucketSchema),
+  monthlyCashFlow: z.array(CashFlowMonthSchema),
+});
+export type PortfolioResponse = z.infer<typeof PortfolioResponseSchema>;
