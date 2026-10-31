@@ -146,3 +146,26 @@ export function sgn(n: number): string {
 export function pnlClass(n: number): string {
   return n > 0.005 ? 'up' : n < -0.005 ? 'down' : '';
 }
+
+/**
+ * Converts days count to readable human phrasing.
+ */
+export function humanDays(d: number): string {
+  const absD = Math.abs(d);
+  if (absD >= 730) return `${Math.floor(absD / 365)} years`;
+  if (absD >= 365) return '1 year';
+  if (absD >= 60) return `${Math.round(absD / 30)} months`;
+  if (absD === 1) return '1 day';
+  return `${absD} days`;
+}
+
+/**
+ * Computes relative date text and overdue state compared to reference date.
+ */
+export function relFuture(iso: string | null | undefined): { text: string; late: boolean } {
+  if (!iso) return { text: '-', late: false };
+  const d = daysFromToday(iso);
+  if (d < 0) return { text: `Overdue by ${humanDays(-d)}`, late: true };
+  if (d === 0) return { text: 'Due today', late: false };
+  return { text: `In ${humanDays(d)}`, late: false };
+}
