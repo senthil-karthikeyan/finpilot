@@ -1,17 +1,20 @@
 import { z } from 'zod';
-import { CUSTOMER_SEGMENTS, KYC_STATUSES, RISK_CATEGORIES } from '../constants/index.js';
+import { CUSTOMER_SEGMENTS, KYC_STATUSES, RISK_LEVELS } from '../constants/index.js';
 
 // ── Customer list item (used in GET /customers) ──────────────────────────────
 
 export const CustomerSummarySchema = z.object({
-  id: z.string(),         // e.g. "C00001"
+  id: z.string(), // e.g. "C0001"
   name: z.string(),
   email: z.string().email(),
+  phone: z.string().nullable(),
   city: z.string(),
+  state: z.string(),
   segment: z.enum(CUSTOMER_SEGMENTS),
   kycStatus: z.enum(KYC_STATUSES),
   accountCount: z.number().int(),
-  aum: z.number(),        // total AUM in INR (from portfolio view)
+  aum: z.number(), // total AUM in INR (from portfolio positions)
+  riskLevel: z.enum(RISK_LEVELS).nullable(),
 });
 export type CustomerSummary = z.infer<typeof CustomerSummarySchema>;
 
@@ -23,18 +26,33 @@ export const CustomerDetailSchema = z.object({
   email: z.string().email(),
   phone: z.string().nullable(),
   city: z.string(),
-  country: z.string(),
+  state: z.string(),
   segment: z.enum(CUSTOMER_SEGMENTS),
   kycStatus: z.enum(KYC_STATUSES),
-  dateOfBirth: z.string().nullable(), // ISO date string YYYY-MM-DD
-  createdAt: z.string(),              // ISO timestamp
+  dateOfBirth: z.string().nullable(),
+  onboardedAt: z.string(),
+  createdAt: z.string(),
+  totalAum: z.number(),
   riskProfile: z
     .object({
-      category: z.enum(RISK_CATEGORIES),
       score: z.number().int(),
+      level: z.enum(RISK_LEVELS),
       assessedAt: z.string(),
+      horizonYears: z.number().int(),
+      liquidityNeed: z.enum(['LOW', 'MEDIUM', 'HIGH']),
     })
     .nullable(),
+  accounts: z.array(
+    z.object({
+      accountId: z.string(),
+      accountType: z.enum(['BROKERAGE', 'MUTUAL_FUND', 'RETIREMENT']),
+      provider: z.string(),
+      openedAt: z.string(),
+      status: z.enum(['ACTIVE', 'DORMANT', 'CLOSED']),
+      baseCurrency: z.string(),
+      aum: z.number(),
+    }),
+  ),
 });
 export type CustomerDetail = z.infer<typeof CustomerDetailSchema>;
 
@@ -46,8 +64,6 @@ export const CustomerQuerySchema = z.object({
   kycStatus: z.enum(KYC_STATUSES).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
-  sortBy: z.enum(['name', 'aum', 'createdAt']).default('name'),
+  sortBy: z.enum(['name', 'aum', 'onboardedAt', 'id']).default('name'),
   sortDir: z.enum(['asc', 'desc']).default('asc'),
 });
-export type CustomerQuery = z.infer<typeof CustomerQuerySchema>;
-
