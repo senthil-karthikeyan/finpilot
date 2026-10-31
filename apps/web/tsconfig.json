@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    // "bundler" resolution works with Next.js Turbopack/webpack without needing file extensions.
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    // Required for React JSX (Next.js handles the JSX transform automatically).
+    "jsx": "preserve",
+    // Faster incremental builds in development.
+    "incremental": true,
+    // Next.js ships its own plugin for better editor IDE integration.
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      // @/* resolves to src/ — standard Next.js App Router convention.
+      "@/*": ["./src/*"],
+      // Resolve shared package directly to source so builds are fast without pre-compiling shared.
+      "@finpilot/shared": ["../../packages/shared/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+

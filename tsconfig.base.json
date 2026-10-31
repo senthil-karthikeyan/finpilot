@@ -1,0 +1,22 @@
+{
+  // Base TypeScript config shared across all workspaces.
+  // Each app extends this and adds its own module/target/lib settings.
+  "compilerOptions": {
+    // Strict mode: catches the most bugs at compile time.
+    "strict": true,
+    // Allows default-import of CommonJS modules (e.g. import cookieParser from 'cookie-parser').
+    "esModuleInterop": true,
+    // Skip type-checking declaration files; speeds up builds.
+    "skipLibCheck": true,
+    // Prevents bugs caused by different file-system casing rules on Linux vs Windows.
+    "forceConsistentCasingInFileNames": true,
+    // Allows importing JSON files as modules.
+    "resolveJsonModule": true,
+    // Emit source maps so stack traces resolve to TypeScript source.
+    "sourceMap": true,
+    // Emit .d.ts files + declaration maps so the shared package is navigable.
+    "declaration": true,
+    "declarationMap": true
+  }
+}
+

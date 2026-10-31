@@ -1,0 +1,52 @@
+# Docker Compose for FinPilot
+# Full version (with build contexts, health checks and depends_on) is added in chore/docker-compose.
+# This skeleton is here so the repo structure is complete from the first commit.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finpilot}
+      POSTGRES_DB: ${POSTGRES_DB:-finpilot}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finpilot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-finpilot}:${POSTGRES_PASSWORD:-finpilot}@postgres:5432/${POSTGRES_DB:-finpilot}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_COOKIE_MAX_AGE_SECONDS: ${JWT_COOKIE_MAX_AGE_SECONDS:-28800}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      PORT: 3001
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      API_URL: http://api:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+

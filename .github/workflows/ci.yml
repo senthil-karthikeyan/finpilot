@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'feat/**', 'chore/**', 'fix/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Lint → Type-check → Test → Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ─────────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── pnpm setup (must come before Node so the cache key is correct) ───────
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+
+      # ── Node.js (matches the Docker base image used in production) ───────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      # ── Install dependencies ─────────────────────────────────────────────────
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Lint ─────────────────────────────────────────────────────────────────
+      - name: Lint
+        run: pnpm lint
+
+      # ── Type-check ───────────────────────────────────────────────────────────
+      - name: Type-check
+        run: pnpm type-check
+
+      # ── Unit tests ───────────────────────────────────────────────────────────
+      - name: Test
+        run: pnpm test
+
+      # ── Build (ensures production build succeeds) ─────────────────────────────
+      - name: Build shared package first
+        run: pnpm --filter @finpilot/shared build
+
+      - name: Build API
+        run: pnpm --filter @finpilot/api build
+
+      - name: Build Web
+        run: pnpm --filter @finpilot/web build
+        env:
+          # Next.js build requires these to be set even if they are placeholders in CI.
+          API_URL: http://localhost:3001
+

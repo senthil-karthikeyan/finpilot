@@ -1,0 +1,14 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+allowBuilds:
+  '@scarf/scarf': true
+  bcrypt: true
+  esbuild: true
+  unrs-resolver: true
+
+settings:
+  # Reject any package published less than 7 days ago (10080 minutes).
+  # Guards against dependency-confusion and supply-chain attacks.
+  minimumReleaseAge: 10080

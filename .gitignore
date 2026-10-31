@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Environment secrets — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# Planning documents — working docs, not source code
+docs/
+
+# Logs
+*.log
+logs/
+pnpm-debug.log*
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# pnpm
+.pnpm-store/
+

@@ -1,0 +1,7 @@
+{
+  // tsconfig.build.json is used by `nest build` (production build).
+  // It excludes test files so they are not compiled into dist/.
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
+}
+
