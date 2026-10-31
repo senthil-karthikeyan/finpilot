@@ -9,7 +9,7 @@ export const ASSET_CLASSES = ['EQUITY', 'ETF', 'MUTUAL_FUND', 'BOND', 'REIT', 'G
 export type AssetClass = (typeof ASSET_CLASSES)[number];
 
 /** Transaction types. */
-export const TRANSACTION_TYPES = ['BUY', 'SELL'] as const;
+export const TRANSACTION_TYPES = ['BUY', 'SELL', 'DIVIDEND', 'FEE'] as const;
 export type TransactionType = (typeof TRANSACTION_TYPES)[number];
 
 /** Transaction statuses. */

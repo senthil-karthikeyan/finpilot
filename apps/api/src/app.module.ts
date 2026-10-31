@@ -10,6 +10,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { PortfolioModule } from './portfolio/portfolio.module.js';
+import { TransactionsModule } from './transactions/transactions.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 
@@ -32,6 +33,9 @@ import { RolesGuard } from './auth/guards/roles.guard.js';
 
     // ── Portfolio & Cash-Flow Analytics ──────────────────────────────────────
     PortfolioModule,
+
+    // ── Transactions Ledger & Filtering ──────────────────────────────────────
+    TransactionsModule,
 
     // ── Config — makes process.env available across all modules ──────────────
     ConfigModule.forRoot({
