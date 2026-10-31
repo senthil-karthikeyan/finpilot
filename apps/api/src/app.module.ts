@@ -12,6 +12,7 @@ import { CustomersModule } from './customers/customers.module.js';
 import { PortfolioModule } from './portfolio/portfolio.module.js';
 import { TransactionsModule } from './transactions/transactions.module.js';
 import { GoalsModule } from './goals/goals.module.js';
+import { AdminModule } from './admin/admin.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 
@@ -40,6 +41,9 @@ import { RolesGuard } from './auth/guards/roles.guard.js';
 
     // ── Financial Goals Management & Progress ────────────────────────────────
     GoalsModule,
+
+    // ── Administration & CSV Ingestion ───────────────────────────────────────
+    AdminModule,
 
     // ── Config — makes process.env available across all modules ──────────────
     ConfigModule.forRoot({
