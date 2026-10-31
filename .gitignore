@@ -11,8 +11,8 @@ out/
 .env.local
 .env.*.local
 
-# Planning documents — working docs, not source code
-docs/
+# Planning documents (unignored docs/architecture and architecture documentation)
+# docs/
 
 # Logs
 *.log
